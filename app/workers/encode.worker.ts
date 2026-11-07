@@ -21,7 +21,7 @@ globalThis.onmessage = async (e) => {
     let result: File | undefined
     let dataToEncode = imageData
 
-    // 自动缩放：短边 >= 2880 时缩放到短边 2160
+    // Auto resize: when the short edge is >= 2880, scale it down to 2160
     if (options.target !== 'thumbnail' && options.autoResize) {
       const minDimension = Math.min(imageData.width, imageData.height)
       if (minDimension >= 2880) {

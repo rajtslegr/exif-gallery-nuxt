@@ -7,22 +7,22 @@ export function usePhotoNavigation(photoId: MaybeRef<string>) {
 
   const id = computed(() => toValue(photoId))
 
-  // 是否有有效的浏览上下文
+  // Whether there is a valid browsing context
   const hasContext = computed(() => navStore.hasValidContext(id.value))
 
-  // 是否可以翻页
+  // Whether paging is possible
   const canGoPrev = computed(() => hasContext.value && navStore.hasPrev(id.value))
   const canGoNext = computed(() => hasContext.value && navStore.hasNext(id.value))
 
-  // 当前位置信息
+  // Current position info
   const currentIndex = computed(() => navStore.getCurrentIndex(id.value))
   const totalLoaded = computed(() => navStore.photoIds.length)
   const hasMore = computed(() => navStore.hasMore)
 
-  // 是否正在加载更多
+  // Whether more photos are loading
   const loading = computed(() => navStore.loading)
 
-  // 跳转到上一张
+  // Go to the previous photo
   async function goPrev() {
     if (!canGoPrev.value)
       return
@@ -33,7 +33,7 @@ export function usePhotoNavigation(photoId: MaybeRef<string>) {
     }
   }
 
-  // 跳转到下一张
+  // Go to the next photo
   async function goNext() {
     if (!canGoNext.value)
       return
@@ -44,9 +44,9 @@ export function usePhotoNavigation(photoId: MaybeRef<string>) {
     }
   }
 
-  // 键盘导航
+  // Keyboard navigation
   function handleKeydown(event: KeyboardEvent) {
-    // 忽略输入框中的按键
+    // Ignore key presses inside form fields
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
       return
     }
@@ -66,7 +66,7 @@ export function usePhotoNavigation(photoId: MaybeRef<string>) {
     }
   }
 
-  // 设置键盘监听
+  // Set up the keyboard listener
   onMounted(() => {
     window.addEventListener('keydown', handleKeydown)
   })
@@ -88,7 +88,7 @@ export function usePhotoNavigation(photoId: MaybeRef<string>) {
   }
 }
 
-// 在列表页使用的辅助函数：设置导航上下文
+// Helper for list pages: set up the navigation context
 export function useNavigationSetup(
   type: NavigationType,
   params: NavigationContext['params'],
@@ -107,7 +107,7 @@ export function useNavigationSetup(
     )
   }
 
-  // 当照片列表或hasMore变化时更新上下文
+  // Refresh the context when the photo list or hasMore changes
   watch([photos, hasMore], () => {
     setupNavigation()
   }, { deep: true })

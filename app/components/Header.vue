@@ -42,9 +42,6 @@ watch(() => route.name, (routeName) => {
   >
     <nav div class="flex flex-auto gap-2 min-w-0 items-center justify-items-start">
       <NuxtLinkLocale to="/" class="font-medium flex-[0_1_auto] min-w-0 truncate">
-        <Logo class="text-primary op-80 size-6" />
-      </NuxtLinkLocale>
-      <NuxtLinkLocale to="/" class="font-medium flex-[0_1_auto] min-w-0 truncate lt-md:hidden">
         {{ config.public.title || $t('title') }}
       </NuxtLinkLocale>
       <HeaderSearchButton v-if="showSearchButton" />
@@ -65,9 +62,6 @@ watch(() => route.name, (routeName) => {
       </TooltipIconButton>
     </nav>
     <nav class="flex items-center">
-      <NuxtLinkLocale to="https://github.com/wiidede/exif-gallery-nuxt" target="_blank">
-        <TooltipIconButton :label="$t('header.github')" icon="i-lucide-github op-50" variant="ghost" size="icon" />
-      </NuxtLinkLocale>
       <NuxtLinkLocale v-if="showAdmin" to="/admin">
         <TooltipIconButton :label="$t('header.admin')" icon="i-lucide-server-cog op-50" variant="ghost" size="icon" />
       </NuxtLinkLocale>

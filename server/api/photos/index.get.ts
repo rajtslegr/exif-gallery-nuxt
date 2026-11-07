@@ -27,9 +27,9 @@ export default eventHandler(async (event) => {
     : 0
   const conditions = []
 
-  // hidden 字段暂保留在数据库中兼容历史数据，但公开图库目前不启用隐藏功能。
+  // The hidden column is kept for legacy rows, but the public gallery does not use it yet.
 
-  // 相机筛选：格式为 "make|model" 或 "make"
+  // Camera filter: "make|model" or just "make"
   if (camera) {
     const cameraStr = String(camera)
     const parts = cameraStr.split('|')
@@ -45,11 +45,11 @@ export default eventHandler(async (event) => {
     }
   }
 
-  // 镜头筛选
+  // Lens filter
   if (lens)
     conditions.push(eq(schema.photo.lensModel, String(lens)))
 
-  // 文本搜索条件：支持多关键词 AND 搜索（空格分隔）
+  // Text search: keywords are AND-ed together (space separated)
   if (search) {
     const keywords = String(search).split(/\s+/).filter(Boolean)
 
@@ -78,7 +78,7 @@ export default eventHandler(async (event) => {
   const queryLimit = limitNum + 1
 
   if (tag) {
-    // 标量 tag 是一个完整标签；只有重复的 tag 参数才表示多标签筛选。
+    // A single tag param is one full tag; repeated tag params mean multi-tag filtering.
     const tagNames = (Array.isArray(tag) ? tag : [tag]).map(String).filter(Boolean)
     const matchedPhotoIds = db.$with('matched_photo_ids').as(
       tagNames.length === 1

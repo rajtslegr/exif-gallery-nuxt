@@ -23,7 +23,7 @@ const selectedModel = computed<{ id: string, name: string, isCustom: boolean } |
   return { id: currentValue, name: formatModelName(currentValue), isCustom: true }
 })
 
-// 获取搜索后的模型列表
+// Get the filtered model list
 const filteredModels = computed(() => {
   if (!searchQuery.value)
     return props.models
@@ -89,7 +89,7 @@ function handleSearchInput(newQuery: string) {
             </div>
           </CommandGroupFixed>
 
-          <!-- 推荐模型列表 -->
+          <!-- Suggested models -->
           <CommandGroup :heading="$t('ai_config.available_models')">
             <CommandItem
               v-for="modelItem in filteredModels"

@@ -4,8 +4,6 @@
 
 **A free personal photo gallery deployable on Cloudflare, with AI image analysis and browser-side image compression**
 
-[English](README.md) | [简体中文](README_zh.md)
-
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 [![Nuxt](https://img.shields.io/badge/Nuxt-4.0-00DC82?style=for-the-badge&logo=nuxt.js&logoColor=white)](https://nuxt.com/)
 [![Vue](https://img.shields.io/badge/Vue-3.5-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)](https://vuejs.org/)
@@ -191,13 +189,13 @@ For users who previously deployed using NuxtHub Admin:
 
 ### Environment Variables
 
-| Variable                              | Required | Default                                                                                                                       | Description                                                             |
-| ------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `NUXT_ADMIN_PASSWORD`                 | Yes      | `admin`                                                                                                                       | Admin panel access password                                             |
-| `NUXT_SESSION_PASSWORD`               | Yes      | --                                                                                                                            | Session encryption key(at least 32 characters)                          |
-| `NUXT_PUBLIC_TITLE`                   | No       | `Exif Gallery Nuxt`                                                                                                           | Application title                                                       |
-| `NUXT_PUBLIC_DESCRIPTION`             | No       | `A full-stack photo album solution that integrates AI intelligent processing, browser image compression, and other functions` | Application description                                                 |
-| `NUXT_PUBLIC_DISABLE_3D_CARD_DEFAULT` | No       | `false`                                                                                                                       | Whether to disable 3D card effect by default (set to `true` to disable) |
+| Variable                   | Required | Default                                                                                                                       | Description                                                        |
+| -------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `NUXT_ADMIN_PASSWORD`      | Yes      | `admin`                                                                                                                       | Admin panel access password                                        |
+| `NUXT_SESSION_PASSWORD`    | Yes      | --                                                                                                                            | Session encryption key(at least 32 characters)                     |
+| `NUXT_PUBLIC_TITLE`        | No       | `Exif Gallery Nuxt`                                                                                                           | Application title                                                  |
+| `NUXT_PUBLIC_DESCRIPTION`  | No       | `A full-stack photo album solution that integrates AI intelligent processing, browser image compression, and other functions` | Application description                                            |
+| `NUXT_PUBLIC_DEFAULT_VIEW` | No       | `gallery`                                                                                                                     | Default view of the home page: `gallery` (vertical feed) or `grid` |
 
 ## 📁 Project Structure
 

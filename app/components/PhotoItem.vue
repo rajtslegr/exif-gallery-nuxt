@@ -27,7 +27,7 @@ const isMini = computed(() => mdScreen.value && mini)
 
 const localPath = useLocalePath()
 
-// 使用 localPath 拼接避免编码问题
+// Use localePath so the URL is encoded correctly
 const cameraLink = computed(() => {
   const p = photo.value
   if (!p.make && !p.model)

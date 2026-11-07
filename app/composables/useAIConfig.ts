@@ -1,20 +1,20 @@
-// 供应商类型
+// Provider type
 export type ProviderType = 'openai' | 'gemini'
 
-// 供应商配置接口
+// Provider config interface
 export interface AIProviderConfig {
-  id: string // 供应商唯一ID
-  name: string // 显示名称
-  type: ProviderType // 供应商类型
-  apiKey: string // API 密钥
-  baseURL?: string // 自定义 base URL
-  model?: string // 自定义模型名称
-  enabled: boolean // 是否启用
-  createdAt: number // 创建时间戳
-  apiFormat?: 'completions' | 'responses' // OpenAI 兼容 API 的格式选择
+  id: string // Unique provider id
+  name: string // Display name
+  type: ProviderType // Provider type
+  apiKey: string // API key
+  baseURL?: string // Custom base URL
+  model?: string // Custom model name
+  enabled: boolean // Whether it is enabled
+  createdAt: number // Creation timestamp
+  apiFormat?: 'completions' | 'responses' // API format for OpenAI-compatible providers
 }
 
-// 旧版 AI 配置接口（用于向后兼容）
+// Legacy AI config interface (kept for backward compatibility)
 interface LegacyAIConfig {
   provider: 'gemini' | 'openai'
   baseUrl: string
@@ -22,14 +22,14 @@ interface LegacyAIConfig {
   enabled: boolean
 }
 
-// 新版 AI 配置接口
+// Current AI config interface
 export interface AIConfig {
-  enabled: boolean // AI 功能总开关
-  selectedProviderId: string // 当前选中的供应商ID
-  providers: Record<string, AIProviderConfig> // 所有供应商配置
+  enabled: boolean // Master switch for the AI features
+  selectedProviderId: string // Id of the currently selected provider
+  providers: Record<string, AIProviderConfig> // All provider configs
 }
 
-// 默认供应商配置
+// Default provider config
 const defaultProviders: Record<string, AIProviderConfig> = {
   openai: {
     id: 'openai',
@@ -54,11 +54,11 @@ const defaultProviders: Record<string, AIProviderConfig> = {
   },
 }
 
-// 迁移旧版配置到新版
+// Migrate the legacy config to the current format
 function migrateLegacyConfig(legacy: LegacyAIConfig): AIConfig {
   const providers: Record<string, AIProviderConfig> = { ...defaultProviders }
 
-  // 更新旧配置中的供应商
+  // Update providers in the legacy config
   if (legacy.provider === 'openai') {
     providers.openai!.apiKey = legacy.secretKey
     providers.openai!.enabled = legacy.enabled
@@ -81,7 +81,7 @@ function migrateLegacyConfig(legacy: LegacyAIConfig): AIConfig {
   }
 }
 
-// 默认新版配置
+// Default config for the current format
 const defaultConfig: AIConfig = {
   enabled: false,
   selectedProviderId: 'gemini',
@@ -95,12 +95,12 @@ export function useAIConfig() {
         try {
           const parsed = JSON.parse(value)
 
-          // 检测旧版配置格式
+          // Detect the legacy config format
           if ('provider' in parsed && 'secretKey' in parsed && 'baseUrl' in parsed && 'enabled' in parsed) {
             return migrateLegacyConfig(parsed as LegacyAIConfig)
           }
 
-          // 返回新版配置
+          // Return the current config format
           return parsed
         }
         catch {
@@ -111,17 +111,17 @@ export function useAIConfig() {
     },
   })
 
-  // 获取当前选中的供应商配置
+  // Get the config of the selected provider
   const selectedProvider = computed(() => {
     return config.value.providers[config.value.selectedProviderId]
   })
 
-  // 获取所有已启用的供应商
+  // Get all enabled providers
   const enabledProviders = computed(() => {
     return Object.values(config.value.providers).filter(p => p.enabled)
   })
 
-  // 添加自定义供应商
+  // Add a custom provider
   function addProvider(provider: Omit<AIProviderConfig, 'id' | 'createdAt'>) {
     const id = `custom-${Date.now()}`
     config.value.providers[id] = {
@@ -132,7 +132,7 @@ export function useAIConfig() {
     return id
   }
 
-  // 更新供应商配置
+  // Update a provider config
   function updateProvider(id: string, updates: Partial<AIProviderConfig>) {
     if (config.value.providers[id]) {
       config.value.providers[id] = {
@@ -142,12 +142,12 @@ export function useAIConfig() {
     }
   }
 
-  // 删除供应商
+  // Remove a provider
   function removeProvider(id: string) {
-    // 不能删除默认供应商
+    // The default provider cannot be removed
     if (id !== 'openai' && id !== 'gemini') {
       delete config.value.providers[id]
-      // 如果删除的是当前选中的供应商，切换到第一个可用供应商
+      // When the selected provider is removed, switch to the first available one
       if (config.value.selectedProviderId === id) {
         const firstAvailable = Object.keys(config.value.providers)[0]
         if (firstAvailable) {
@@ -157,14 +157,14 @@ export function useAIConfig() {
     }
   }
 
-  // 切换当前供应商
+  // Switch the selected provider
   function setSelectedProvider(id: string) {
     if (config.value.providers[id]) {
       config.value.selectedProviderId = id
     }
   }
 
-  // 获取供应商的默认模型
+  // Get the default model of a provider
   function getDefaultModelForType(type: ProviderType): string {
     switch (type) {
       case 'openai':

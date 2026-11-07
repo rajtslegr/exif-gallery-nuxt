@@ -17,7 +17,7 @@ const emit = defineEmits<{
   'save': [provider: Omit<AIProviderConfig, 'id' | 'createdAt'>]
 }>()
 
-// 表单状态
+// Form state
 const isEditing = computed(() => !!props.provider)
 const providerId = computed(() => props.provider?.id || `custom-${Date.now()}`)
 
@@ -31,14 +31,14 @@ const availableModels = ref<string[]>([])
 const isLoadingModels = ref(false)
 const testConnectionResult = ref<{ success: boolean, error?: string, modelCount?: number } | null>(null)
 
-// 监听类型变化，自动更新默认 baseURL
+// Update the default baseURL when the provider type changes
 watch(type, (newType) => {
   if (!props.provider) {
     baseUrl.value = getDefaultBaseUrl(newType)
   }
 })
 
-// 获取默认 baseURL
+// Get the default baseURL
 function getDefaultBaseUrl(providerType: ProviderType): string {
   switch (providerType) {
     case 'openai':
@@ -50,18 +50,18 @@ function getDefaultBaseUrl(providerType: ProviderType): string {
   }
 }
 
-// 标准化 base URL（确保以 / 结尾）
+// Normalize the base URL (ensure it ends with /)
 function normalizeBaseUrl(url: string): string {
   return url.endsWith('/') ? url : `${url}/`
 }
 
-// Fetch 模型列表
+// Fetch the model list
 async function fetchModelsList() {
   if (!apiKey.value) {
     return
   }
 
-  // Gemini 不需要 base URL，但 OpenAI 需要
+  // Gemini does not need a base URL, OpenAI does
   if (type.value === 'openai' && !baseUrl.value) {
     return
   }
@@ -84,12 +84,12 @@ async function fetchModelsList() {
     const models = await fetchModels(tempConfig)
     availableModels.value = models.map(m => m.id)
 
-    // 如果当前 model 不在列表中且列表不为空，自动选择第一个
+    // Pick the first model when the current one is missing from a non-empty list
     if (availableModels.value.length > 0 && !availableModels.value.includes(model.value!)) {
       model.value = availableModels.value[0]!
     }
 
-    // 显示成功提示，包含模型数量
+    // Show a success toast with the number of models
     if (availableModels.value.length > 0) {
       testConnectionResult.value = {
         success: true,
@@ -116,7 +116,7 @@ async function fetchModelsList() {
   }
 }
 
-// 保存
+// Save
 function handleSave() {
   if (!name.value || !apiKey.value) {
     return
@@ -132,18 +132,18 @@ function handleSave() {
     apiFormat: type.value === 'openai' ? apiFormat.value : undefined,
   })
 
-  // 重置表单
+  // Reset the form
   resetForm()
   emit('update:open', false)
 }
 
-// 取消
+// Cancel
 function handleCancel() {
   resetForm()
   emit('update:open', false)
 }
 
-// 重置表单
+// Reset the form
 function resetForm() {
   name.value = ''
   type.value = 'openai'
@@ -155,10 +155,10 @@ function resetForm() {
   testConnectionResult.value = null
 }
 
-// 监听 open 变化，重置表单
+// Reset the form when `open` changes
 watch(() => props.open, (isOpen) => {
   if (isOpen && props.provider) {
-    // 编辑模式，填充数据
+    // Edit mode: fill in the data
     name.value = props.provider.name
     type.value = props.provider.type
     apiKey.value = props.provider.apiKey
@@ -169,7 +169,7 @@ watch(() => props.open, (isOpen) => {
     testConnectionResult.value = null
   }
   else if (!isOpen) {
-    // 关闭时重置
+    // Reset on close
     resetForm()
   }
 })
@@ -185,7 +185,7 @@ watch(() => props.open, (isOpen) => {
         </DialogDescription>
       </DialogHeader>
       <div class="py-4 flex flex-col gap-4">
-        <!-- 供应商名称 -->
+        <!-- Provider name -->
         <div>
           <Label for="provider-name">{{ $t('ai_config.provider_name') }}</Label>
           <Input
@@ -196,7 +196,7 @@ watch(() => props.open, (isOpen) => {
           />
         </div>
 
-        <!-- 供应商类型 -->
+        <!-- Provider type -->
         <div>
           <Label for="provider-type">{{ $t('ai_config.provider_type') }}</Label>
           <Select id="provider-type" v-model="type" :disabled="isEditing && (providerId === 'openai' || providerId === 'gemini')">
@@ -214,9 +214,9 @@ watch(() => props.open, (isOpen) => {
           </Select>
         </div>
 
-        <!-- API 格式 (仅 OpenAI 兼容供应商显示) -->
+        <!-- API format (only for OpenAI-compatible providers) -->
         <div v-if="type === 'openai'">
-          <Label for="provider-api-format">{{ $t('ai_config.api_format') || 'API 格式' }}</Label>
+          <Label for="provider-api-format">{{ $t('ai_config.api_format') || 'API format' }}</Label>
           <Select id="provider-api-format" v-model="apiFormat">
             <SelectTrigger>
               <SelectValue />
@@ -253,7 +253,7 @@ watch(() => props.open, (isOpen) => {
           />
         </div>
 
-        <!-- 模型 -->
+        <!-- Model -->
         <div>
           <div class="mb-1 flex items-center justify-between">
             <Label for="provider-model">{{ $t('ai_config.model') }}</Label>
@@ -279,7 +279,7 @@ watch(() => props.open, (isOpen) => {
           />
         </div>
 
-        <!-- 测试连接结果 -->
+        <!-- Connection test result -->
         <div v-if="testConnectionResult" class="text-xs p-2 border rounded">
           <div v-if="testConnectionResult.success" class="text-green-600 flex items-center">
             <div class="i-lucide-check-circle mr-1" />

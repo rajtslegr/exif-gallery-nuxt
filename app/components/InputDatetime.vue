@@ -19,9 +19,9 @@ function fromDateTimeLocal(value?: string): Date | undefined {
 }
 
 const dateTimeValue = computed({
-  get: () => toDateTimeLocal(model.value), // 从 Date 转换为字符串
+  get: () => toDateTimeLocal(model.value), // Date to string
   set: (newValue: string) => {
-    model.value = fromDateTimeLocal(newValue) // 从字符串转换为 Date
+    model.value = fromDateTimeLocal(newValue) // String to Date
   },
 })
 </script>

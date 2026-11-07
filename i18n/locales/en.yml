@@ -24,7 +24,6 @@ slideshow:
   random: Random
   keep_awake: Keep screen awake
 header:
-  github: View project on GitHub
   admin: Admin Panel
   admin_dashboard: Admin Dashboard
   admin_upload: Upload Photos
@@ -43,13 +42,10 @@ sort:
   asc: Ascending
 theme:
   color: Color
-  radius: Radius
   mode: Theme
   light: Light
   dark: Dark
   system: System
-  language: Language
-  3dcard: Disable 3D Card Effect
 login_form:
   title: Login
   description: Login to manage photos

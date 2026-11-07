@@ -26,10 +26,10 @@ export function usePhotosInfinite(params?: MaybeRef<{
     return photosStore.get(k)!
   }
 
-  // 当前 state，使用 shallowRef 避免深度响应
+  // Current state; shallowRef avoids deep reactivity
   const state = shallowRef<InfiniteState>(getOrCreateState(key.value))
 
-  // loading 不在 store 中，避免 SSR 状态污染
+  // loading lives outside the store to avoid SSR state leaking
   const loading = ref(false)
   const error = ref()
 
@@ -61,7 +61,7 @@ export function usePhotosInfinite(params?: MaybeRef<{
     }
   }
 
-  // 监听 key 变化（排序变化），切换 state 并加载数据
+  // Switch state and reload when the key (sorting) changes
   watch(key, (newKey) => {
     state.value = getOrCreateState(newKey)
     if (state.value.photos.value.length === 0)

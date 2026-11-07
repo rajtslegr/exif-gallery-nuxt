@@ -9,39 +9,39 @@ defineProps<{
 const { config: uploadConfig } = useUploadConfig()
 const { config: aiConfig, selectedProvider, addProvider, updateProvider, removeProvider, setSelectedProvider } = useAIConfig()
 
-// AI 供应商管理状态
+// AI provider management state
 const showProviderDialog = ref(false)
 const editingProvider = ref<AIProviderConfig | null>(null)
 
-// 打开添加供应商对话框
+// Open the add-provider dialog
 function openAddProviderDialog() {
   editingProvider.value = null
   showProviderDialog.value = true
 }
 
-// 打开编辑供应商对话框
+// Open the edit-provider dialog
 function openEditProviderDialog(provider: AIProviderConfig) {
   editingProvider.value = provider
   showProviderDialog.value = true
 }
 
-// 保存供应商
+// Save the provider
 function handleSaveProvider(providerData: Omit<AIProviderConfig, 'id' | 'createdAt'>) {
   if (editingProvider.value) {
-    // 更新现有供应商
+    // Update an existing provider
     updateProvider(editingProvider.value.id, providerData)
   }
   else {
-    // 添加新供应商
+    // Add a new provider
     addProvider(providerData)
   }
   editingProvider.value = null
 }
 
-// 选择供应商
+// Select a provider
 function selectProvider(providerId: string) {
   setSelectedProvider(providerId)
-  // 选中供应商时自动启用该供应商
+  // Selecting a provider also enables it
   updateProvider(providerId, { enabled: true })
 }
 </script>
@@ -164,7 +164,7 @@ function selectProvider(providerId: string) {
           </div>
           <CollapsibleContent>
             <div class="ml-6 flex flex-col gap-4">
-              <!-- 供应商列表 -->
+              <!-- Provider list -->
               <div>
                 <div class="mb-2 flex items-center justify-between">
                   <Label>{{ $t('ai_config.providers') }}</Label>
@@ -187,7 +187,7 @@ function selectProvider(providerId: string) {
                     @click="selectProvider(provider.id)"
                   >
                     <div class="flex flex-1 gap-2 min-w-0 items-center">
-                      <!-- shadcn 风格的 radio 样式 -->
+                      <!-- shadcn-style radio styling -->
                       <div
                         class="text-primary border border-primary rounded-full flex shrink-0 h-4 w-4 ring-offset-background transition-all items-center justify-center relative focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                       >
@@ -242,7 +242,7 @@ function selectProvider(providerId: string) {
     </UploadConfigCard>
   </div>
 
-  <!-- 供应商编辑对话框 -->
+  <!-- Provider edit dialog -->
   <ProviderEditDialog
     :provider="editingProvider ?? undefined"
     :open="showProviderDialog"

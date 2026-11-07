@@ -15,7 +15,7 @@ const { orderBy, order, setSort } = usePhotoSort()
       />
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end">
-      <!-- 排序方向组 -->
+      <!-- Sort direction group -->
       <DropdownMenuRadioGroup v-model="order" @update:model-value="v => setSort(orderBy, v as 'asc' | 'desc')">
         <DropdownMenuLabel class="text-xs text-muted-foreground">
           {{ $t('sort.direction') }}
@@ -36,7 +36,7 @@ const { orderBy, order, setSort } = usePhotoSort()
 
       <DropdownMenuSeparator />
 
-      <!-- 排序字段组 -->
+      <!-- Sort field group -->
       <DropdownMenuRadioGroup v-model="orderBy" @update:model-value="v => setSort(v as 'takenAt' | 'createdAt')">
         <DropdownMenuLabel class="text-xs text-muted-foreground">
           {{ $t('sort.field') }}

@@ -23,17 +23,17 @@ export interface NavigationState {
 }
 
 export const useNavigationStore = defineStore('navigation', () => {
-  // 使用 sessionStorage 持久化，刷新页面后可以恢复上下文
+  // Persisted in sessionStorage so a refresh keeps the context
   const context = useSessionStorage<NavigationContext | null>('nav-context', null)
   const photoIds = useSessionStorage<string[]>('nav-photo-ids', [])
   const hasMore = useSessionStorage<boolean>('nav-has-more', false)
   const offset = useSessionStorage<number>('nav-offset', 0)
   const limit = useSessionStorage<number>('nav-limit', 12)
 
-  // 本地状态，不持久化
+  // Local state, not persisted
   const loading = ref(false)
 
-  // 设置浏览上下文
+  // Set the browsing context
   function setContext(
     navContext: NavigationContext,
     initialPhotos: IPhoto[],
@@ -47,7 +47,7 @@ export const useNavigationStore = defineStore('navigation', () => {
     limit.value = initialLimit
   }
 
-  // 清空上下文
+  // Clear the context
   function clearContext() {
     context.value = null
     photoIds.value = []
@@ -56,25 +56,25 @@ export const useNavigationStore = defineStore('navigation', () => {
     limit.value = 12
   }
 
-  // 检查是否有有效的浏览上下文
+  // Check for a valid browsing context
   function hasValidContext(photoId: string): boolean {
     if (!context.value)
       return false
     return photoIds.value.includes(photoId)
   }
 
-  // 获取当前照片在队列中的索引
+  // Get the index of the current photo in the queue
   function getCurrentIndex(photoId: string): number {
     return photoIds.value.indexOf(photoId)
   }
 
-  // 是否有上一张
+  // Whether there is a previous photo
   function hasPrev(photoId: string): boolean {
     const index = getCurrentIndex(photoId)
     return index > 0
   }
 
-  // 是否有下一张
+  // Whether there is a next photo
   function hasNext(photoId: string): boolean {
     const index = getCurrentIndex(photoId)
     if (index === -1)
@@ -84,7 +84,7 @@ export const useNavigationStore = defineStore('navigation', () => {
     return hasMore.value
   }
 
-  // 获取上一张ID
+  // Get the previous photo id
   function getPrevId(photoId: string): string | null {
     const index = getCurrentIndex(photoId)
     if (index <= 0)
@@ -92,18 +92,18 @@ export const useNavigationStore = defineStore('navigation', () => {
     return photoIds.value[index - 1] ?? null
   }
 
-  // 获取下一张ID
+  // Get the next photo id
   async function getNextId(photoId: string): Promise<string | null> {
     const index = getCurrentIndex(photoId)
     if (index === -1)
       return null
 
-    // 如果下一张已在队列中
+    // If the next photo is already queued
     if (index < photoIds.value.length - 1) {
       return photoIds.value[index + 1] ?? null
     }
 
-    // 需要加载更多
+    // Needs to load more
     if (hasMore.value) {
       await loadMorePhotos()
       return photoIds.value[index + 1] ?? null
@@ -112,7 +112,7 @@ export const useNavigationStore = defineStore('navigation', () => {
     return null
   }
 
-  // 加载更多照片
+  // Load more photos
   async function loadMorePhotos(): Promise<void> {
     if (loading.value || !hasMore.value || !context.value)
       return
@@ -136,7 +136,7 @@ export const useNavigationStore = defineStore('navigation', () => {
     }
     catch (err: any) {
       console.error('Failed to load more photos:', err)
-      toast.error('加载失败', { description: err?.data?.message || err?.message || '无法加载更多照片' })
+      toast.error('Failed to load', { description: err?.data?.message || err?.message || 'Could not load more photos' })
     }
     finally {
       loading.value = false

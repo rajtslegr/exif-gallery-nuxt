@@ -13,7 +13,7 @@ async function getImageAspectRatio(file: File) {
 export async function getExifData(file: File) {
   let photo: IPhotoForm = {}
 
-  // 解析EXIF元数据
+  // Parse the EXIF metadata
   const exifData = await exifr.parse(file)
 
   photo = {

@@ -24,8 +24,8 @@ function cleanUpAiTextResponse(text: string) {
 }
 
 /**
- * 初始化 AI 客户端
- * 使用当前选中的供应商配置
+ * Create the AI client
+ * Uses the config of the selected provider
  */
 function initializeAIClient() {
   const { config, selectedProvider } = useAIConfig()
@@ -48,10 +48,10 @@ function initializeAIClient() {
 }
 
 /**
- * 获取 AI 图片分析
- * @param imageFile 图片文件
- * @param compress 是否压缩图片
- * @returns 图片分析结果
+ * Analyze an image with the AI provider
+ * @param imageFile the image file
+ * @param compress whether to compress the image first
+ * @returns the image analysis result
  */
 export async function getAiImageAnalysis(imageFile: File, compress = true) {
   const model = initializeAIClient()
@@ -89,7 +89,7 @@ export async function getAiImageAnalysis(imageFile: File, compress = true) {
         content: [
           {
             type: 'text',
-            text: `${AI_IMAGE_PROMPT}\n\n请严格按照以下JSON格式返回结果：{"title": "", "caption": "", "tags": [], "semanticDescription": ""}`,
+            text: `${AI_IMAGE_PROMPT}\n\nReturn the result strictly in the following JSON format：{"title": "", "caption": "", "tags": [], "semanticDescription": ""}`,
           },
           {
             type: 'file',
@@ -100,13 +100,13 @@ export async function getAiImageAnalysis(imageFile: File, compress = true) {
       }],
     })
 
-    // 尝试从文本中提取 JSON
+    // Try to extract JSON from the text
     const jsonMatch = text.match(/\{[\s\S]*\}/)
     const jsonStr = jsonMatch ? jsonMatch[0] : text
 
     const parsed = JSON.parse(jsonStr)
 
-    // 使用 zod schema 验证解析结果
+    // Validate the parsed result with the zod schema
     const validated = imageAnalysisSchema.parse(parsed)
 
     const result: ImageAnalysis = {

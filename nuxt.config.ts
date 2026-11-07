@@ -75,13 +75,12 @@ export default defineNuxtConfig({
     public: {
       title: process.env.NUXT_PUBLIC_TITLE,
       description: process.env.NUXT_PUBLIC_DESCRIPTION,
-      disable3DCardDefault: process.env.NUXT_PUBLIC_DISABLE_3D_CARD_DEFAULT,
+      defaultView: process.env.NUXT_PUBLIC_DEFAULT_VIEW,
     },
   },
   i18n: {
     locales: [
       { code: 'en', iso: 'en-US', file: 'en.yml' },
-      { code: 'zh', iso: 'zh-CN', file: 'zh.yml' },
     ],
     defaultLocale: 'en',
   },

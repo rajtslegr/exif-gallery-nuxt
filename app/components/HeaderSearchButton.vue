@@ -6,16 +6,16 @@ const router = useRouter()
 
 const open = ref(false)
 
-// 搜索输入（防抖）
+// Search input (debounced)
 const searchInput = ref('')
 const debouncedSearch = refDebounced(searchInput, 300)
 
-// 监听 URL 变化同步到输入框
+// Sync URL changes back into the input
 watch(() => route.query.search, (value) => {
   searchInput.value = (value as string) || ''
 }, { immediate: true })
 
-// 监听防抖后的搜索词更新 URL
+// Write the debounced search term into the URL
 watch(debouncedSearch, (value) => {
   if (value) {
     router.push({
@@ -23,7 +23,7 @@ watch(debouncedSearch, (value) => {
     })
   }
   else {
-    // 清空搜索时移除 search 参数
+    // Drop the search param when the query is cleared
     const { search, ...restQuery } = route.query
     router.push({ query: restQuery })
   }
@@ -46,7 +46,7 @@ function clearSearch() {
     </PopoverTrigger>
     <PopoverContent class="op-80 w-96" align="start">
       <div class="space-y-2">
-        <!-- 搜索框 -->
+        <!-- Search field -->
         <div class="flex gap-2 items-center">
           <Input
             v-model="searchInput"
@@ -63,7 +63,7 @@ function clearSearch() {
           </Button>
         </div>
 
-        <!-- 搜索提示 -->
+        <!-- Search hints -->
         <p class="text-xs text-muted-foreground">
           {{ $t('search.hint') }}
         </p>

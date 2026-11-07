@@ -83,7 +83,7 @@ async function upload(fileEntry: FileEntry) {
     }))
 
     if (response.success) {
-      toast.success(`上传成功 ${fileEntry.photo.title || ''}`, { description: fileEntry.file.name })
+      toast.success(`Uploaded ${fileEntry.photo.title || ''}`, { description: fileEntry.file.name })
       const index = files.value.findIndex(f => f.id === fileEntry.id)
       if (index !== -1) {
         files.value.splice(index, 1)
@@ -91,15 +91,15 @@ async function upload(fileEntry: FileEntry) {
       photosStore.clear()
     }
     else {
-      toast.error('上传失败', { description: '请重试' })
+      toast.error('Upload failed', { description: 'Please try again' })
       fileEntry.uploadLoading = false
       setFile(fileEntry)
     }
   }
   catch (error: any) {
     console.error(error)
-    toast.error('上传失败', {
-      description: error?.message || '上传失败',
+    toast.error('Upload failed', {
+      description: error?.message || 'Upload failed',
     })
     fileEntry.uploadLoading = false
     setFile(fileEntry)

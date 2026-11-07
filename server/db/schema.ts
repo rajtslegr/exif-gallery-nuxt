@@ -36,7 +36,7 @@ export const photo = sqliteTable('photos', {
   aspectRatio: real('aspect_ratio'),
   // photo config
   priorityOrder: real('priority_order'),
-  // hidden 字段暂保留以兼容历史数据，但图库查询不再使用隐藏功能
+  // The hidden column is kept for legacy rows; gallery queries no longer use it
   hidden: integer('hidden', { mode: 'boolean' }).default(false),
   // sql default
   updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),

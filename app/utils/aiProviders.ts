@@ -3,7 +3,7 @@ import type { AIProviderConfig } from '../composables/useAIConfig'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 
-// 模型信息接口
+// Model info interface
 export interface AIModel {
   id: string
   name?: string
@@ -35,7 +35,7 @@ export function createAIClient(provider: AIProviderConfig): LanguageModel | null
           baseURL: provider.baseURL || undefined,
           apiKey: provider.apiKey,
         })
-        // 使用自定义模型或默认模型
+        // Use the custom model or the default one
         const modelId = provider.model || 'gemini-3.1-flash-lite'
         return client(modelId)
       }
@@ -51,10 +51,10 @@ export function createAIClient(provider: AIProviderConfig): LanguageModel | null
 }
 
 /**
- * 从供应商获取模型列表
- * 支持不同供应商的模型获取方式：
- * - OpenAI: 使用 /models 端点
- * - Gemini: 使用 models.list 端点 https://generativelanguage.googleapis.com/v1beta/models
+ * Fetch the model list from the provider
+ * Providers expose models differently:
+ * - OpenAI: /models endpoint
+ * - Gemini: the models.list endpoint https://generativelanguage.googleapis.com/v1beta/models
  */
 export async function fetchModels(
   provider: AIProviderConfig,
@@ -65,7 +65,7 @@ export async function fetchModels(
   }
 
   try {
-    // Gemini 使用 models.list 端点
+    // Gemini uses the models.list endpoint
     if (provider.type === 'gemini') {
       const url = new URL('https://generativelanguage.googleapis.com/v1beta/models')
       url.searchParams.append('key', provider.apiKey)
@@ -86,7 +86,7 @@ export async function fetchModels(
 
       const data = await response.json()
 
-      // Gemini 响应格式: { models: [{ name: "models/gemini-1.5-flash-001", baseModelId: "gemini-1.5-flash", ... }] }
+      // Gemini response shape: { models: [{ name: "models/gemini-1.5-flash-001", baseModelId: "gemini-1.5-flash", ... }] }
       if (data.models && Array.isArray(data.models)) {
         return data.models.map((m: any) => ({
           id: m.baseModelId || m.name,
@@ -99,14 +99,14 @@ export async function fetchModels(
       return []
     }
 
-    // OpenAI 兼容的 API 使用 /models 端点
+    // OpenAI-compatible APIs use the /models endpoint
     if (provider.type === 'openai') {
       if (!provider.baseURL) {
         console.error('[AI] Base URL is missing for provider:', provider.id)
         return []
       }
 
-      // 确保 baseURL 以 / 结尾，避免 URL 拼接问题
+      // Ensure baseURL ends with / so URL joining works
       const normalizedBaseURL = provider.baseURL.endsWith('/') ? provider.baseURL : `${provider.baseURL}/`
       const url = new URL(`${normalizedBaseURL}models`)
 
@@ -127,7 +127,7 @@ export async function fetchModels(
 
       const data = await response.json()
 
-      // OpenAI 响应格式: { object: "list", data: [{ id: "gpt-4o", object: "model", ... }] }
+      // OpenAI response shape: { object: "list", data: [{ id: "gpt-4o", object: "model", ... }] }
       if (data.data && Array.isArray(data.data)) {
         return data.data.map((m: any) => ({
           id: m.id,
@@ -152,7 +152,7 @@ export async function fetchModels(
 }
 
 /**
- * 测试供应商连接
+ * Test the provider connection
  */
 export async function testProviderConnection(
   provider: AIProviderConfig,
@@ -166,7 +166,7 @@ export async function testProviderConnection(
   }
 
   try {
-    // 尝试获取模型列表来测试连接
+    // Fetch the model list to test the connection
     await fetchModels(provider)
     return { success: true }
   }
@@ -177,7 +177,7 @@ export async function testProviderConnection(
 }
 
 /**
- * 格式化模型名称用于显示
+ * Format a model name for display
  */
 export function formatModelName(modelId: string | undefined): string {
   if (!modelId)

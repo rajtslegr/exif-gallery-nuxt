@@ -24,7 +24,7 @@ defineProps<{
       <source v-if="photo.webp" :srcset="`/photos/${photo.webp}`" type="image/webp">
       <img
         :src="`/photos/${photo.jpeg || photo.webp || photo.avif}`"
-        :class="cn('h-full m-auto object-contain', fullscreen ? 'rounded-none' : 'rounded-lg', imageClass)"
+        :class="cn('h-full m-auto object-contain', imageClass)"
         :fetchpriority="priority ? 'high' : undefined"
         :alt="photo.semanticDescription || photo.caption || photo.title"
       >

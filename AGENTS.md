@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## User Preferences
 
-**Important**: The user prefers communication in Chinese (中文). When working on this project:
+**Important**: The user prefers communication in English. When working on this project:
 
 - Keep conversations in Chinese
 - Use Context7 MCP for official documentation lookups when encountering complex/uncertain issues
@@ -142,7 +142,7 @@ When modifying schema:
 ## Component Structure
 
 - `app/components/ui/`: shadcn-vue base components (Button, Dialog, Card, etc.)
-- `app/components/inspira/`: inspira-ui animated components (3D effects, motions)
+- `app/components/inspira/`: inspira-ui animated components (border beam, hover button, file upload)
 - `app/components/ui-pro/`: Project-specific extended UI components
 - Auto-import enabled for all components, composables, and utils
 - Use `<script setup lang="ts">` with Composition API exclusively
@@ -165,7 +165,7 @@ Optional:
 
 - `NUXT_PUBLIC_TITLE`: Application title (default: "Exif Gallery Nuxt")
 - `NUXT_PUBLIC_DESCRIPTION`: Meta description
-- `NUXT_PUBLIC_DISABLE_3D_CARD_DEFAULT`: Disable 3D card effects (`"true"`/`"false"`)
+- `NUXT_PUBLIC_DEFAULT_VIEW`: Default home page view (`gallery`/`grid`)
 
 ## Key Files for Common Tasks
 

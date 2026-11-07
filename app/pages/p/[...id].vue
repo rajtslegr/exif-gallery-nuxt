@@ -40,7 +40,7 @@ const idleState = useState('p-idle', () => true)
 const { idle } = useIdle(2000, { initialState: idleState.value })
 watch(idle, val => idleState.value = val, { immediate: true })
 
-// 照片翻页导航
+// Photo paging navigation
 const { hasContext, canGoPrev, canGoNext, loading, goPrev, goNext }
   = usePhotoNavigation(id)
 const navStore = useNavigationStore()
@@ -299,7 +299,7 @@ onBeforeUnmount(() => {
   clearSlideshowTimer()
 })
 
-// 移动端滑动支持
+// Swipe support on mobile
 const imageContainerRef = ref<HTMLElement>()
 const { isSwiping, direction } = useSwipe(imageContainerRef, {
   threshold: 50,

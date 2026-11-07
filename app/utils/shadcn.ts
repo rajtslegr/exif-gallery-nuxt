@@ -31,8 +31,6 @@ export const allColors: Color[] = [
   'violet',
 ]
 
-export const RADII = ['0', '0.3', '0.5', '0.75', '1']
-
 export const baseColors = [
   { name: 'zinc', label: 'Zinc', primary: '0.21 0.006 285.885', primaryDark: '0.92 0.004 286.32' },
   { name: 'slate', label: 'Slate', primary: '0.208 0.042 265.755', primaryDark: '0.929 0.013 255.508' },
