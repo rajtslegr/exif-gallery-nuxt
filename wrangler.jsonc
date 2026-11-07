@@ -7,6 +7,10 @@
     "directory": "./.output/public/",
     "binding": "ASSETS"
   },
+  "vars": {
+    "NUXT_PUBLIC_DESCRIPTION": "Explore the photography portfolio of Petr Rajtslegr. Unobtrusive observations of urban environments, details, and atmosphere.",
+    "NUXT_PUBLIC_TITLE": "Petr Rajtslegr | Photo Blog"
+  },
   "observability": {
     "enabled": true
   },
