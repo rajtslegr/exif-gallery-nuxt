@@ -163,7 +163,7 @@ function deletePhoto(id: string) {
             </div>
             <div class="flex flex-wrap gap-x-2 gap-y-1" :class="{ 'md:flex-col': !fullscreen }">
               <NuxtLink
-                v-for="tag in (photo.tags ? photo.tags.split(',') : [])"
+                v-for="tag in photo.tags"
                 :key="tag"
                 :to="`${localPath('/tag')}/${encodeURIComponent(tag)}`"
                 class="m--1 p-1 rounded-lg op-80 w-fit transition-colors hover:bg-muted"

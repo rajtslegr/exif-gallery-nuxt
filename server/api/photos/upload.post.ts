@@ -85,6 +85,8 @@ export default eventHandler(async (event) => {
       return acc
     }, {})
 
+    const tags = formData.get('tags')?.toString() || null
+
     // Add metadata fields from form data
     const photoEntry: Partial<Photo> = {
       // File info
@@ -95,7 +97,6 @@ export default eventHandler(async (event) => {
       title: formData.get('title')?.toString() || null,
       caption: formData.get('caption')?.toString() || null,
       semanticDescription: formData.get('semanticDescription')?.toString() || null,
-      tags: formData.get('tags')?.toString() || null,
       // EXIF data
       make: formData.get('make')?.toString() || null,
       model: formData.get('model')?.toString() || null,
@@ -130,7 +131,7 @@ export default eventHandler(async (event) => {
       }
 
       const photoId = newPhoto[0]!.id
-      await processPhotoTags(photoId, photoEntry.tags)
+      await processPhotoTags(photoId, tags)
       await purgeGalleryCache(event)
     }
     catch (error) {

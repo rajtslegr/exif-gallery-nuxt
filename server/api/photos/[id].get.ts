@@ -1,5 +1,6 @@
 import { db } from '@nuxthub/db'
 import { eq } from 'drizzle-orm'
+import { loadPhotoTags } from '../../utils/photos'
 
 export default eventHandler(async (event) => {
   const { id } = event.context.params || {}
@@ -22,5 +23,7 @@ export default eventHandler(async (event) => {
     })
   }
 
-  return photo
+  const tagsByPhotoId = await loadPhotoTags([photo.id])
+
+  return { ...photo, tags: tagsByPhotoId.get(photo.id) ?? [] }
 })

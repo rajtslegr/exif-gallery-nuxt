@@ -16,7 +16,6 @@ export const photo = sqliteTable('photos', {
   title: text('title'),
   caption: text('caption'),
   semanticDescription: text('semantic_description'),
-  tags: text('tags'),
   // exif info
   make: text('make'),
   model: text('model'),
@@ -36,8 +35,6 @@ export const photo = sqliteTable('photos', {
   aspectRatio: real('aspect_ratio'),
   // photo config
   priorityOrder: real('priority_order'),
-  // The hidden column is kept for legacy rows; gallery queries no longer use it
-  hidden: integer('hidden', { mode: 'boolean' }).default(false),
   // sql default
   updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
   createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),

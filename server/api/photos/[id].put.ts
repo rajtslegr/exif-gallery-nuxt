@@ -2,6 +2,7 @@ import { db } from '@nuxthub/db'
 import { eq } from 'drizzle-orm'
 import { useValidatedBody, useValidatedParams, z } from 'h3-zod'
 import { purgeGalleryCache } from '../../utils/cache'
+import { loadPhotoTags } from '../../utils/photos'
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event)
@@ -32,11 +33,12 @@ export default defineEventHandler(async (event) => {
   })
 
   const body = await useValidatedBody(event, updatableFields)
+  const { tags, ...rest } = body
 
   try {
     const updatedPhoto = await db.update(schema.photo)
       .set({
-        ...body,
+        ...rest,
         takenAt: body.takenAt ? new Date(body.takenAt) : undefined,
         updatedAt: new Date(),
       })
@@ -46,10 +48,11 @@ export default defineEventHandler(async (event) => {
     if (!updatedPhoto.length)
       throw createError({ statusCode: 404, message: 'photo not found' })
 
-    await processPhotoTags(id, body.tags)
+    await processPhotoTags(id, tags)
     await purgeGalleryCache(event)
 
-    return updatedPhoto[0]
+    const tagsByPhotoId = await loadPhotoTags([id])
+    return { ...updatedPhoto[0], tags: tagsByPhotoId.get(id) ?? [] }
   }
   catch (error) {
     // Let our own HTTP errors (e.g. the 404 above) reach the client untouched

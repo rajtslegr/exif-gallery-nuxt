@@ -9,6 +9,22 @@ const { loggedIn } = useUserSession()
 const pStore = usePhotosStore()
 
 const editedPhoto = ref<IPhoto>()
+
+// UploadPhotoForm works with the comma separated tag string, IPhoto with an array
+const editedPhotoForm = computed<IPhotoForm>({
+  get: () => editedPhoto.value
+    ? { ...editedPhoto.value, tags: editedPhoto.value.tags.join(',') }
+    : {},
+  set: (form) => {
+    if (!editedPhoto.value)
+      return
+    editedPhoto.value = {
+      ...editedPhoto.value,
+      ...form,
+      tags: form.tags ? form.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
+    }
+  },
+})
 const isSaving = ref(false)
 
 watch(() => photo, (val) => {
@@ -33,7 +49,10 @@ async function saveChanges() {
       method: 'PUT',
       body: {
         id: editedPhoto.value.id,
-        ...Object.fromEntries(Object.entries(editedPhoto.value).filter(([_, value]) => !!value)),
+        tags: editedPhoto.value.tags.join(','),
+        ...Object.fromEntries(
+          Object.entries(editedPhoto.value).filter(([key, value]) => key !== 'tags' && !!value),
+        ),
       },
     })
 
@@ -76,7 +95,7 @@ async function saveChanges() {
           />
         </section>
         <Card v-if="editedPhoto" :key="editedPhoto.id" class="p-4">
-          <UploadPhotoForm v-model="editedPhoto" />
+          <UploadPhotoForm v-model="editedPhotoForm" />
         </Card>
       </div>
       <DialogFooter class="flex flex-row gap-4 items-center justify-center">

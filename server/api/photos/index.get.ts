@@ -2,6 +2,7 @@ import { db } from '@nuxthub/db'
 import { and, asc, desc, eq, inArray, like, or, sql } from 'drizzle-orm'
 import { useValidatedQuery, z } from 'h3-zod'
 import { setGalleryPhotosCacheHeaders } from '../../utils/cache'
+import { loadPhotoTags } from '../../utils/photos'
 
 const photoQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
@@ -17,7 +18,7 @@ const photoQuerySchema = z.object({
 type SerializedPhoto = typeof schema.photo.$inferSelect
 
 interface PhotosResponse {
-  data: SerializedPhoto[]
+  data: (SerializedPhoto & { tags: string[] })[]
   hasMore: boolean
   limit: number
   offset: number
@@ -128,9 +129,11 @@ export default eventHandler(async (event): Promise<PhotosResponse> => {
       .offset(offsetNum)
 
     const hasMore = rows.length > limitNum
+    const photos = rows.slice(0, limitNum).map(row => row.photo)
+    const tagsByPhotoId = await loadPhotoTags(photos.map(photo => photo.id))
 
     return {
-      data: rows.slice(0, limitNum).map(row => row.photo),
+      data: photos.map(photo => ({ ...photo, tags: tagsByPhotoId.get(photo.id) ?? [] })),
       hasMore,
       limit: limitNum,
       offset: offsetNum,
@@ -144,9 +147,11 @@ export default eventHandler(async (event): Promise<PhotosResponse> => {
     orderBy: orderExpressions,
   })
   const hasMore = photos.length > limitNum
+  const pagePhotos = photos.slice(0, limitNum)
+  const tagsByPhotoId = await loadPhotoTags(pagePhotos.map(photo => photo.id))
 
   return {
-    data: photos.slice(0, limitNum),
+    data: pagePhotos.map(photo => ({ ...photo, tags: tagsByPhotoId.get(photo.id) ?? [] })),
     hasMore,
     limit: limitNum,
     offset: offsetNum,

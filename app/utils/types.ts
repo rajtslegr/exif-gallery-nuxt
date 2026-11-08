@@ -9,8 +9,11 @@ export type APIDataPhoto = Omit<Photo, 'fileModified' | 'takenAt' | 'createdAt' 
     takenAt: Date | string | null
     createdAt: Date | string | null
     updatedAt: Date | string | null
+    // Tags come from the photo_tags relation, not from a photos column
+    tags: string[]
   }
 
-export type IPhoto = ConvertNullToUndefined<Photo>
+export type IPhoto = ConvertNullToUndefined<Omit<Photo, 'tags'>> & { tags: string[] }
 
-export type IPhotoForm = Partial<IPhoto>
+// The upload/edit form keeps the comma separated representation
+export type IPhotoForm = Partial<Omit<IPhoto, 'tags'>> & { tags?: string }

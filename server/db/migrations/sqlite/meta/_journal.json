@@ -50,6 +50,13 @@
       "when": 1794162570876,
       "tag": "0006_lean_loners",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1794162644716,
+      "tag": "0007_nervous_magma",
+      "breakpoints": true
     }
   ]
 }

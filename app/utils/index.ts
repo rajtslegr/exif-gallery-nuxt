@@ -39,7 +39,9 @@ export function formatExposureTime(exposureTime: number) {
     : `${exposureTime}`
 }
 
-export function formatExposure(p: IPhotoForm): string[] {
+type ExifTextFields = Partial<Pick<IPhoto, 'fNumber' | 'exposureTime' | 'iso' | 'make' | 'model' | 'lensModel'>>
+
+export function formatExposure(p: ExifTextFields): string[] {
   return [
     `ƒ/${p.fNumber || '--'}`,
     `${p.exposureTime ? formatExposureTime(p.exposureTime) : '--'}s`,
@@ -47,7 +49,7 @@ export function formatExposure(p: IPhotoForm): string[] {
   ]
 }
 
-export function formatCameraText(p: IPhotoForm) {
+export function formatCameraText(p: ExifTextFields) {
   // Remove 'Corporation' from makes like 'Nikon Corporation'
   const make = p.make?.replace(/ Corporation/i, '')
   // Remove potential duplicate make from model
@@ -55,7 +57,7 @@ export function formatCameraText(p: IPhotoForm) {
   return [make, model].filter(Boolean).join(' ') || '--'
 }
 
-export function formatLensText(p: IPhotoForm) {
+export function formatLensText(p: ExifTextFields) {
   return p.lensModel || '--'
 }
 
