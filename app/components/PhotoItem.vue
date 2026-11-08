@@ -79,11 +79,11 @@ function deletePhoto(id: string) {
       ]"
     >
       <!-- info inner -->
-      <div :class="fullscreen ? 'w-full' : 'h-full'">
+      <div :class="fullscreen ? 'w-full md:relative md:pr-48' : 'h-full'">
         <!-- title and action buttons -->
         <div
           class="flex"
-          :class="fullscreen ? 'mb-2 justify-between' : 'lt-md:mb-2 md:flex-col lt-md:justify-between'"
+          :class="fullscreen ? 'mb-1 items-center' : 'lt-md:mb-2 md:flex-col lt-md:justify-between'"
         >
           <div>
             <h2 class="text-xl color-foreground">
@@ -93,7 +93,11 @@ function deletePhoto(id: string) {
               {{ photo.caption }}
             </p>
           </div>
-          <div v-if="!hideAction" class="ml--2.4 flex min-h-2 items-center">
+          <div
+            v-if="!hideAction"
+            class="ml--2.4 flex min-h-2 items-center"
+            :class="fullscreen ? 'md:ml-0 md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2' : ''"
+          >
             <slot name="action-button" />
             <EditPhotoDialog
               v-if="editable"
@@ -126,12 +130,12 @@ function deletePhoto(id: string) {
 
         <div
           class="text-sm flex gap-4"
-          :class="fullscreen ? 'flex-wrap items-start' : 'md:flex-col md:gap-2 lt-md:justify-between'"
+          :class="fullscreen ? 'flex-wrap items-center gap-x-3 gap-y-1' : 'md:flex-col md:gap-2 lt-md:justify-between'"
         >
           <!-- date and camera/lens info -->
-          <div class="flex flex-col gap-2">
+          <div :class="fullscreen ? 'flex flex-wrap items-center gap-x-3 gap-y-1' : 'flex flex-col gap-2'">
             <span class="text-0.8em leading-none op-66" data-allow-mismatch="text">{{ formatDate(photo.takenAt) }}</span>
-            <div>
+            <div :class="fullscreen ? 'flex flex-wrap items-center gap-x-1' : ''">
               <NuxtLink
                 v-if="photoWithExif && cameraLink"
                 :to="cameraLink"
