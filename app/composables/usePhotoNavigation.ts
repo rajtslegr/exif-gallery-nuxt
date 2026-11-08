@@ -4,6 +4,7 @@ export function usePhotoNavigation(photoId: MaybeRef<string>) {
   const localePath = useLocalePath()
   const navStore = useNavigationStore()
   const router = useRouter()
+  const { goBack } = useBackNavigation()
 
   const id = computed(() => toValue(photoId))
 
@@ -62,6 +63,13 @@ export function usePhotoNavigation(photoId: MaybeRef<string>) {
       case ' ':
         event.preventDefault()
         goNext()
+        break
+      case 'Escape':
+        // When the browser itself is in fullscreen, Escape already exits it
+        if (document.fullscreenElement)
+          break
+        event.preventDefault()
+        goBack()
         break
     }
   }

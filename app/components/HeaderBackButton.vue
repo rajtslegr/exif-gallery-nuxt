@@ -1,13 +1,5 @@
 <script setup lang="ts">
-const router = useRouter()
-const localePath = useLocalePath()
-
-function goBack() {
-  if (router.options.history.state.back)
-    router.back()
-  else
-    navigateTo(localePath('/'))
-}
+const { goBack } = useBackNavigation()
 </script>
 
 <template>
