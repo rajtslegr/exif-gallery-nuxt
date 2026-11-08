@@ -13,10 +13,8 @@ const router = useRouter()
 const localePath = useLocalePath()
 
 const id = ref(route.params.id?.[0] || '')
-if (!id.value) {
-  navigateTo(localePath('/'))
-  throw new Error('id is required')
-}
+if (!id.value)
+  throw createError({ statusCode: 404, statusMessage: 'Photo not found', fatal: true })
 
 watch(() => route.params.id, (params) => {
   const nextId = params?.[0]
@@ -26,7 +24,33 @@ watch(() => route.params.id, (params) => {
 
 const { loggedIn } = useUserSession()
 
-const { photo } = usePhoto(id)
+const { photo, error: photoError } = await usePhoto(id)
+if (photoError.value) {
+  const statusCode = (photoError.value as { statusCode?: number }).statusCode === 404 ? 404 : 500
+  throw createError({
+    statusCode,
+    statusMessage: statusCode === 404 ? 'Photo not found' : 'Failed to load photo',
+    fatal: true,
+  })
+}
+
+const photoImageUrl = computed(() => {
+  const path = photo.value?.webp || photo.value?.jpeg || photo.value?.avif
+  return path ? new URL(`/photos/${path}`, useRequestURL().origin).href : undefined
+})
+
+const photoTitle = computed(() => photo.value?.title || photo.value?.fileName)
+const photoDescription = computed(() => photo.value?.caption || photo.value?.semanticDescription)
+
+useSeoMeta({
+  title: () => photoTitle.value,
+  description: () => photoDescription.value,
+  ogTitle: () => photoTitle.value,
+  ogDescription: () => photoDescription.value,
+  ogImage: () => photoImageUrl.value,
+  ogType: 'article',
+  twitterCard: 'summary_large_image',
+})
 
 const pStore = usePhotosStore()
 const photosStore = pStore.photosStore
@@ -380,7 +404,8 @@ const { isSwiping, direction } = useSwipe(imageContainerRef, {
 </template>
 
 <style scoped>
-.current-image {
+/* the <img> lives in PhotoItemCard, so the rule needs :deep() to reach it */
+:deep(.current-image) {
   view-transition-name: vtn-image;
 }
 </style>

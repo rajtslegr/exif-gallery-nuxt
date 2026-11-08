@@ -87,7 +87,8 @@ setupNavigation()
 </template>
 
 <style scoped>
-.current-image {
+/* the <img> lives in PhotoItemCard, so the rule needs :deep() to reach it */
+:deep(.current-image) {
   view-transition-name: vtn-image;
 }
 </style>

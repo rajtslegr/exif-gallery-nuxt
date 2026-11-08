@@ -1,3 +1,5 @@
+import type { SerializeObject } from 'nitropack'
+
 export function usePhotosInfinite(params?: MaybeRef<{
   orderBy?: string
   order?: string
@@ -82,37 +84,28 @@ export function usePhotosInfinite(params?: MaybeRef<{
   }
 }
 
-export function usePhoto(id: MaybeRef<string>) {
-  const photo = ref<IPhoto | null>(null)
-  const loading = ref(false)
+export async function usePhoto(id: MaybeRef<string>) {
+  const photoId = computed(() => toValue(id))
 
-  async function fetchPhoto() {
-    if (loading.value || !toValue(id))
+  // awaited so the page knows the outcome during SSR (real 404 instead of a skeleton)
+  const { data, pending, error, refresh } = await useFetch<SerializeObject<APIDataPhoto>>(
+    () => `/api/photos/${photoId.value}`,
+    { watch: [photoId] },
+  )
+
+  // Keep the toast feedback for client-side failures (e.g. photo deleted meanwhile)
+  watch(error, (err) => {
+    if (!err)
       return
-    try {
-      loading.value = true
-      const response = await $fetch(`/api/photos/${toValue(id) as ':id'}`, {
-        method: 'get',
-      })
-      photo.value = deserializePhoto(response)
-    }
-    catch (err: any) {
-      console.error(err)
-      toast.error('An error occurred', { description: err?.data?.message || err?.message || 'Failed to get photo' })
-    }
-    finally {
-      loading.value = false
-    }
-  }
-
-  watch(() => toValue(id), () => {
-    fetchPhoto()
+    const fetchError = err as { data?: { message?: string }, message?: string }
+    toast.error('An error occurred', { description: fetchError.data?.message || fetchError.message || 'Failed to get photo' })
   }, { immediate: true })
 
   return {
-    photo,
-    loading,
-    refresh: fetchPhoto,
+    photo: computed(() => (data.value ? deserializePhoto(data.value) : null)),
+    loading: pending,
+    error,
+    refresh,
   }
 }
 
