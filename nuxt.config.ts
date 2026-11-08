@@ -68,9 +68,6 @@ export default defineNuxtConfig({
   colorMode: {
     classSuffix: '',
   },
-  experimental: {
-    viewTransition: true,
-  },
   runtimeConfig: {
     public: {
       title: process.env.NUXT_PUBLIC_TITLE,

@@ -5,8 +5,6 @@ const { photos, loading, limit = 36 } = defineProps<{
   limit?: number
 }>()
 
-const currentPhoto = useState<string>('currentPhoto', () => ref(''))
-
 // Grid tiles are ~400px, so the thumbnail is always the cheapest sharp-enough source
 function photoSrc(photo: IPhoto) {
   const path = photo.thumbnail || photo.webp || photo.jpeg || photo.avif
@@ -30,10 +28,9 @@ function photoSrc(photo: IPhoto) {
         >
           <img
             :src="`/photos/${photoSrc(photo)}`"
-            class="h-full w-full block object-contain" :class="[{ 'current-image': currentPhoto === photo.id }]"
+            class="h-full w-full block object-contain"
             :alt="photo.semanticDescription || photo.caption || photo.title"
             loading="lazy"
-            @click="currentPhoto = photo.id"
           >
         </NuxtLinkLocale>
       </PhotoItemCard>
@@ -47,9 +44,3 @@ function photoSrc(photo: IPhoto) {
     </template>
   </div>
 </template>
-
-<style scoped>
-.current-image {
-  view-transition-name: vtn-image;
-}
-</style>

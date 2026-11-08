@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const currentPhoto = useState<string>('currentPhoto', () => ref(''))
-
 const route = useRoute()
 const { loggedIn } = useUserSession()
 const { orderBy, order } = usePhotoSort()
@@ -42,7 +40,6 @@ setupNavigation()
         :key="photo.id"
         :photo="photo"
         :logged-in="loggedIn"
-        :image-class="{ 'current-image': currentPhoto === photo.id }"
         :priority="index === 0"
         editable
         @deleted="photos = photos.filter(p => p.id !== $event)"
@@ -56,7 +53,6 @@ setupNavigation()
               icon="i-lucide-image-upscale text-muted-foreground"
               variant="ghost"
               size="icon"
-              @click="currentPhoto = photo.id"
             />
           </NuxtLinkLocale>
         </template>
@@ -85,10 +81,3 @@ setupNavigation()
     </div>
   </section>
 </template>
-
-<style scoped>
-/* the <img> lives in PhotoItemCard, so the rule needs :deep() to reach it */
-:deep(.current-image) {
-  view-transition-name: vtn-image;
-}
-</style>

@@ -347,7 +347,6 @@ const { isSwiping, direction } = useSwipe(imageContainerRef, {
     <PhotoItem
       :photo="photo"
       :logged-in="loggedIn"
-      image-class="current-image"
       :fullscreen="true"
       editable
       @deleted="onDeleted()"
@@ -402,10 +401,3 @@ const { isSwiping, direction } = useSwipe(imageContainerRef, {
     <Skeleton class="w-full aspect-[4/3]" />
   </section>
 </template>
-
-<style scoped>
-/* the <img> lives in PhotoItemCard, so the rule needs :deep() to reach it */
-:deep(.current-image) {
-  view-transition-name: vtn-image;
-}
-</style>

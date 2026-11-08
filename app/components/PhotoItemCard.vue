@@ -7,7 +7,6 @@ const {
 } = defineProps<{
   photo?: IPhoto
   class?: HTMLAttributes['class']
-  imageClass?: HTMLAttributes['class']
   mini?: boolean
   fullscreen?: boolean
   priority?: boolean
@@ -16,6 +15,6 @@ const {
 
 <template>
   <slot>
-    <PhotoItemCardDefault :photo="photo" :image-class="imageClass" :mini="mini" :fullscreen="fullscreen" :priority="priority" :class="cn({ 'h-full': mini && !fullscreen }, className)" />
+    <PhotoItemCardDefault :photo="photo" :mini="mini" :fullscreen="fullscreen" :priority="priority" :class="cn({ 'h-full': mini && !fullscreen }, className)" />
   </slot>
 </template>

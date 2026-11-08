@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue'
-
 const {
   mini,
   fullscreen = false,
 } = defineProps<{
   loggedIn?: boolean
-  imageClass?: HTMLAttributes['class']
   hideAction?: boolean
   mini?: boolean
   editable?: boolean
@@ -54,17 +51,16 @@ function deletePhoto(id: string) {
   <div :class="[fullscreen ? 'h-full w-full flex flex-col' : 'flex gap-1 lt-md:flex-col lg:gap-8 md:gap-4']">
     <div v-if="fullscreen" class="flex-1 min-h-0 relative">
       <div class="h-full w-full md:px-20">
-        <PhotoItemCard :photo="photo" :image-class="imageClass" fullscreen :priority="priority" class="h-full w-full" />
+        <PhotoItemCard :photo="photo" fullscreen :priority="priority" class="h-full w-full" />
       </div>
       <slot name="image-overlay" />
     </div>
     <div v-else-if="isMini" class="relative md:flex-[2] xl:flex-[3]">
-      <PhotoItemCard class="h-full w-full inset-0 absolute" :photo="photo" :image-class="imageClass" :priority="priority" mini />
+      <PhotoItemCard class="h-full w-full inset-0 absolute" :photo="photo" :priority="priority" mini />
     </div>
     <PhotoItemCard
       v-else
       :photo="photo"
-      :image-class="imageClass"
       :priority="priority"
       class="md:flex-[2] xl:flex-[3]"
     />

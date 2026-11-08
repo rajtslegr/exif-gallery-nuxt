@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue'
-import { cn } from '~/lib/utils'
-
 defineProps<{
   photo?: IPhoto
-  imageClass?: HTMLAttributes['class']
   mini?: boolean
   fullscreen?: boolean
   priority?: boolean
@@ -24,7 +20,7 @@ defineProps<{
       <source v-if="photo.webp" :srcset="`/photos/${photo.webp}`" type="image/webp">
       <img
         :src="`/photos/${photo.jpeg || photo.webp || photo.avif}`"
-        :class="cn('h-full m-auto object-contain', imageClass)"
+        class="m-auto h-full object-contain"
         :fetchpriority="priority ? 'high' : undefined"
         :alt="photo.semanticDescription || photo.caption || photo.title"
       >
