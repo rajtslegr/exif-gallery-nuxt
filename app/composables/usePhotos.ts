@@ -14,22 +14,11 @@ export function usePhotosInfinite(params?: MaybeRef<{
   loading: Ref<boolean>
 } {
   const pStore = usePhotosStore()
-  const photosStore = pStore.photosStore
   const paramsValue = computed(() => toValue(params))
   const key = computed(() => JSON.stringify(paramsValue.value))
 
-  function getOrCreateState(k: string): InfiniteState {
-    if (!photosStore.has(k)) {
-      photosStore.set(k, {
-        photos: ref([]),
-        hasMore: ref(true),
-      })
-    }
-    return photosStore.get(k)!
-  }
-
   // Current state; shallowRef avoids deep reactivity
-  const state = shallowRef<InfiniteState>(getOrCreateState(key.value))
+  const state = shallowRef<InfiniteState>(pStore.getState(key.value))
 
   // loading lives outside the store to avoid SSR state leaking
   const loading = ref(false)
@@ -65,7 +54,7 @@ export function usePhotosInfinite(params?: MaybeRef<{
 
   // Switch state and reload when the key (sorting) changes
   watch(key, (newKey) => {
-    state.value = getOrCreateState(newKey)
+    state.value = pStore.getState(newKey)
     if (state.value.photos.value.length === 0)
       loadMore()
   })

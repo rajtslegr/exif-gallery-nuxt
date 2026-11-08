@@ -115,10 +115,12 @@ export function useNavigationSetup(
     )
   }
 
-  // Refresh the context when the photo list or hasMore changes
-  watch([photos, hasMore], () => {
+  // Refresh the context when a page is appended or hasMore flips. Watching the
+  // length (not the whole list, deeply) keeps scrolling from re-serialising the
+  // id array into session storage on every mutation of every photo object.
+  watch([() => photos.value.length, hasMore], () => {
     setupNavigation()
-  }, { deep: true })
+  })
 
   return {
     setupNavigation,
