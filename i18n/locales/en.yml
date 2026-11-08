@@ -33,6 +33,7 @@ header:
   logout: Logout
   sort: Sort Photos
   search: Search Photos
+  back: Back
 sort:
   taken_at: Taken Time
   created_at: Created Time

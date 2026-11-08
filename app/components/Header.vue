@@ -37,13 +37,14 @@ watch(() => route.name, (routeName) => {
 
 <template>
   <header
-    class="px-4 border-b border-dashed bg-background/60 flex h-12 w-full transition-transform duration-300 items-center top-0 justify-between z-50 backdrop-blur"
+    class="px-4 border-b bg-background/60 flex h-12 w-full transition-transform duration-300 items-center top-0 justify-between z-50 backdrop-blur"
     :class="fullscreen ? (idle ? 'absolute -translate-y-full op-0 pointer-events-none' : 'absolute translate-y-0 op-100') : 'sticky'"
   >
     <nav div class="flex flex-auto gap-2 min-w-0 items-center justify-items-start">
       <NuxtLinkLocale to="/" class="font-medium flex-[0_1_auto] min-w-0 truncate">
         {{ config.public.title || $t('title') }}
       </NuxtLinkLocale>
+      <HeaderBackButton v-if="fullscreen" />
       <HeaderSearchButton v-if="showSearchButton" />
     </nav>
     <nav div class="flex flex-auto min-w-0 items-center justify-items-start">
