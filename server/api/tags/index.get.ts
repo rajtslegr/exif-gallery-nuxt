@@ -1,13 +1,20 @@
 import { db } from '@nuxthub/db'
-import { desc, sql } from 'drizzle-orm'
+import { desc, gt, sql } from 'drizzle-orm'
+import { useValidatedQuery, z } from 'h3-zod'
 import { setGalleryTagsCacheHeaders } from '../../utils/cache'
+
+const tagsQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(1000).default(500),
+  offset: z.coerce.number().int().min(0).default(0),
+})
 
 export default eventHandler(async (event) => {
   setGalleryTagsCacheHeaders(event)
 
-  const query = getQuery(event)
-  const { limit, offset } = query
+  const { limit, offset } = await useValidatedQuery(event, tagsQuerySchema)
 
+  // Tags that lost their last photo are cleaned up on write, but filter them
+  // out here as well so a stale counter can never surface as an empty filter.
   const tags = await db
     .select({
       id: schema.tag.id,
@@ -16,19 +23,21 @@ export default eventHandler(async (event) => {
       photoCount: schema.tag.photoCount,
     })
     .from(schema.tag)
-    .orderBy(desc(schema.tag.photoCount))
-    .limit(limit ? Number(limit) : 9999999)
-    .offset(offset ? Number(offset) : 0)
+    .where(gt(schema.tag.photoCount, 0))
+    .orderBy(desc(schema.tag.photoCount), schema.tag.name)
+    .limit(limit)
+    .offset(offset)
 
   const total = await db
     .select({ count: sql<number>`count(*)` })
     .from(schema.tag)
+    .where(gt(schema.tag.photoCount, 0))
     .get()
 
   return {
     data: tags,
     total: total?.count || 0,
-    limit: limit ? Number(limit) : undefined,
-    offset: offset ? Number(offset) : undefined,
+    limit,
+    offset,
   }
 })

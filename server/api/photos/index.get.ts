@@ -1,30 +1,42 @@
 import { db } from '@nuxthub/db'
 import { and, asc, desc, eq, inArray, like, or, sql } from 'drizzle-orm'
+import { useValidatedQuery, z } from 'h3-zod'
 import { setGalleryPhotosCacheHeaders } from '../../utils/cache'
 
-export default eventHandler(async (event) => {
+const photoQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+  orderBy: z.enum(['takenAt', 'createdAt']).default('takenAt'),
+  order: z.enum(['asc', 'desc']).default('desc'),
+  tag: z.union([z.string(), z.array(z.string())]).optional(),
+  camera: z.string().max(200).optional(),
+  lens: z.string().max(200).optional(),
+  search: z.string().max(100).optional(),
+})
+
+type SerializedPhoto = typeof schema.photo.$inferSelect
+
+interface PhotosResponse {
+  data: SerializedPhoto[]
+  hasMore: boolean
+  limit: number
+  offset: number
+}
+
+export default eventHandler(async (event): Promise<PhotosResponse> => {
   setGalleryPhotosCacheHeaders(event)
 
-  const query = getQuery(event)
   const {
-    limit = 20,
-    offset = 0,
-    orderBy = 'takenAt',
-    order = 'desc',
+    limit: limitNum,
+    offset: offsetNum,
+    orderBy,
+    order,
     tag,
     camera,
     lens,
     search,
-  } = query
+  } = await useValidatedQuery(event, photoQuerySchema)
 
-  const requestedLimit = Number(limit)
-  const requestedOffset = Number(offset)
-  const limitNum = Number.isFinite(requestedLimit)
-    ? Math.max(Math.trunc(requestedLimit), 1)
-    : 20
-  const offsetNum = Number.isFinite(requestedOffset)
-    ? Math.max(Math.trunc(requestedOffset), 0)
-    : 0
   const conditions = []
 
   // The hidden column is kept for legacy rows, but the public gallery does not use it yet.
