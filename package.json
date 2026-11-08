@@ -13,8 +13,7 @@
     "ui": "pnpx shadcn-vue",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
-    "logs": "wrangler pages deployment tail",
-    "logs:preview": "wrangler pages deployment tail --environment preview"
+    "logs": "wrangler tail"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.114",
