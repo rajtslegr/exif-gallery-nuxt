@@ -38,6 +38,7 @@ export default defineEventHandler(async (event) => {
       .set({
         ...body,
         takenAt: body.takenAt ? new Date(body.takenAt) : undefined,
+        updatedAt: new Date(),
       })
       .where(eq(schema.photo.id, id))
       .returning()
@@ -51,6 +52,10 @@ export default defineEventHandler(async (event) => {
     return updatedPhoto[0]
   }
   catch (error) {
+    // Let our own HTTP errors (e.g. the 404 above) reach the client untouched
+    if (error && typeof error === 'object' && 'statusCode' in error)
+      throw error
+
     throw createError({
       statusCode: 500,
       message: 'Failed to update photo',
