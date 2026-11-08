@@ -318,65 +318,61 @@ const { isSwiping, direction } = useSwipe(imageContainerRef, {
   <section
     v-if="photo"
     ref="imageContainerRef"
-    class="bg-white relative overflow-hidden h-dvh dark:bg-black"
+    class="bg-white flex flex-col h-[calc(100dvh-3rem)] relative overflow-hidden dark:bg-black"
   >
-    <div
-      v-if="hasContext"
-      class="transition-all duration-300 right-4 top-14 absolute z-20"
-      :class="idle
-        ? '-translate-y-full opacity-0 pointer-events-none'
-        : 'translate-y-0 opacity-100'"
-    >
-      <SlideshowControls
-        v-model:playing="slideshowPlaying"
-        v-model:keep-screen-awake="slideshowKeepAwake"
-        v-model:interval="slideshowInterval"
-        v-model:mode="slideshowMode"
-      />
-    </div>
-    <div
-      v-if="hasContext && canGoPrev"
-      class="group cursor-pointer left-2 top-1/2 absolute z-10 -translate-y-1/2"
-    >
-      <Button
-        variant="ghost"
-        class="text-xl text-foreground/67 rounded-lg bg-background/30 size-16 shadow-lg transition-all duration-300 backdrop-blur hover:bg-background/50"
-        :class="cn(
-          (isSwiping ? direction === 'right' : !idle) ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0 pointer-events-none',
-          'group-hover:translate-x-0 group-hover:opacity-100 group-hover:pointer-events-auto',
-        )"
-        @click="goPrev"
-      >
-        <div class="i-lucide-chevron-left" />
-      </Button>
-    </div>
-    <div
-      v-if="hasContext && canGoNext"
-      class="group cursor-pointer right-2 top-1/2 absolute z-10 -translate-y-1/2"
-    >
-      <ProButton
-        variant="ghost"
-        class="text-xl text-foreground/67 rounded-lg bg-background/30 size-16 shadow-lg transition-all duration-300 backdrop-blur hover:bg-background/50"
-        :class="cn(
-          (isSwiping ? direction === 'left' : !idle) ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none',
-          'group-hover:translate-x-0 group-hover:opacity-100 group-hover:pointer-events-auto',
-        )"
-        :loading="loading"
-        @click="goNext"
-      >
-        <div class="i-lucide-chevron-right" />
-      </ProButton>
-    </div>
-
     <PhotoItem
       :photo="photo"
       :logged-in="loggedIn"
       image-class="current-image"
       :fullscreen="true"
-      :idle="idle"
       editable
       @deleted="onDeleted()"
-    />
+    >
+      <template #image-overlay>
+        <div
+          v-if="hasContext && canGoPrev"
+          class="group cursor-pointer left-2 top-1/2 absolute z-10 lt-md:hidden -translate-y-1/2"
+        >
+          <Button
+            variant="ghost"
+            class="text-xl text-foreground/67 rounded-lg bg-background/30 size-16 shadow-lg transition-all duration-300 backdrop-blur hover:bg-background/50"
+            :class="cn(
+              (isSwiping ? direction === 'right' : !idle) ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0 pointer-events-none',
+              'group-hover:translate-x-0 group-hover:opacity-100 group-hover:pointer-events-auto',
+            )"
+            @click="goPrev"
+          >
+            <div class="i-lucide-chevron-left" />
+          </Button>
+        </div>
+        <div
+          v-if="hasContext && canGoNext"
+          class="group cursor-pointer right-2 top-1/2 absolute z-10 lt-md:hidden -translate-y-1/2"
+        >
+          <ProButton
+            variant="ghost"
+            class="text-xl text-foreground/67 rounded-lg bg-background/30 size-16 shadow-lg transition-all duration-300 backdrop-blur hover:bg-background/50"
+            :class="cn(
+              (isSwiping ? direction === 'left' : !idle) ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none',
+              'group-hover:translate-x-0 group-hover:opacity-100 group-hover:pointer-events-auto',
+            )"
+            :loading="loading"
+            @click="goNext"
+          >
+            <div class="i-lucide-chevron-right" />
+          </ProButton>
+        </div>
+      </template>
+      <template #action-button>
+        <SlideshowControls
+          v-if="hasContext"
+          v-model:playing="slideshowPlaying"
+          v-model:keep-screen-awake="slideshowKeepAwake"
+          v-model:interval="slideshowInterval"
+          v-model:mode="slideshowMode"
+        />
+      </template>
+    </PhotoItem>
   </section>
   <section v-else>
     <Skeleton class="w-full aspect-[4/3]" />

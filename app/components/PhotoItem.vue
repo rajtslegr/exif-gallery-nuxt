@@ -11,7 +11,6 @@ const {
   mini?: boolean
   editable?: boolean
   fullscreen?: boolean
-  idle?: boolean
   priority?: boolean
 }>()
 
@@ -52,38 +51,35 @@ function deletePhoto(id: string) {
 </script>
 
 <template>
-  <div :class="[fullscreen ? 'h-dvh w-dvw' : 'flex gap-1 lt-md:flex-col lg:gap-8 md:gap-4']">
-    <div v-if="isMini" class="relative md:flex-[2] xl:flex-[3]">
+  <div :class="[fullscreen ? 'h-full w-full flex flex-col' : 'flex gap-1 lt-md:flex-col lg:gap-8 md:gap-4']">
+    <div v-if="fullscreen" class="flex-1 min-h-0 relative">
+      <div class="h-full w-full md:px-20">
+        <PhotoItemCard :photo="photo" :image-class="imageClass" fullscreen :priority="priority" class="h-full w-full" />
+      </div>
+      <slot name="image-overlay" />
+    </div>
+    <div v-else-if="isMini" class="relative md:flex-[2] xl:flex-[3]">
       <PhotoItemCard class="h-full w-full inset-0 absolute" :photo="photo" :image-class="imageClass" :priority="priority" mini />
     </div>
     <PhotoItemCard
       v-else
       :photo="photo"
       :image-class="imageClass"
-      :fullscreen="fullscreen"
       :priority="priority"
-      :class="fullscreen ? 'flex-1' : 'md:flex-[2] xl:flex-[3]'"
+      class="md:flex-[2] xl:flex-[3]"
     />
     <!-- info outer -->
     <div
       class="color-foreground/67 transition-all duration-300"
       :class="[
         fullscreen
-          ? 'absolute z-49 inset-x-0 bottom-2 flex justify-center pointer-events-none'
+          ? 'px-4 py-2 border-t max-h-[45dvh] overflow-y-auto shrink-0'
           : 'h-fit top-16 relative sticky z-1 md:flex-[1]',
         isMini ? 'md:top-0' : '',
-        fullscreen ? idle
-          ? 'translate-y-full op-0 pointer-events-none'
-          : 'translate-y-0 op-100'
-        : '',
       ]"
     >
       <!-- info inner -->
-      <div
-        :class="fullscreen
-          ? 'bg-background/30 backdrop-blur shadow-2xl rounded-md w-fit h-fit p-4 pointer-events-auto'
-          : 'h-full'"
-      >
+      <div :class="fullscreen ? 'w-full' : 'h-full'">
         <!-- title and action buttons -->
         <div
           class="flex"

@@ -14,7 +14,7 @@ defineProps<{
 <template>
   <div
     :class="[
-      fullscreen ? 'h-dvh w-dvw' : 'max-h-[calc(100dvh-5rem)]',
+      fullscreen ? 'h-full w-full' : 'max-h-[calc(100dvh-5rem)]',
       mini ? 'h-full' : 'w-full',
     ]"
     :style="{ aspectRatio: !mini && photo?.aspectRatio || undefined }"
