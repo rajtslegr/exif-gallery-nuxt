@@ -14,13 +14,18 @@ function parseTagNames(tags: string) {
   return [...new Set(names)]
 }
 
-function recountTagsStatement(tagIds: string[]) {
+export function recountTagsStatement(tagIds: string[]) {
   // Recompute instead of incrementing/decrementing so the counter self-heals
   return db.update(schema.tag)
     .set({
       photoCount: sql`(select count(*) from ${schema.photoTag} where ${schema.photoTag.tagId} = ${schema.tag.id})`,
     })
     .where(inArray(schema.tag.id, tagIds))
+}
+
+export function dropEmptyTagsStatement(tagIds: string[]) {
+  return db.delete(schema.tag)
+    .where(and(inArray(schema.tag.id, tagIds), eq(schema.tag.photoCount, 0)))
 }
 
 async function resolveTagIds(tagNames: string[]) {
@@ -86,12 +91,8 @@ export async function processPhotoTags(photoId: string, tags: string | null | un
     )
   }
 
-  statements.push(
-    recountTagsStatement(affectedTagIds),
-    // Tags left without any photo are dropped so they stop showing up as filters
-    db.delete(schema.tag)
-      .where(and(inArray(schema.tag.id, affectedTagIds), eq(schema.tag.photoCount, 0))),
-  )
+  // Tags left without any photo are dropped so they stop showing up as filters
+  statements.push(recountTagsStatement(affectedTagIds), dropEmptyTagsStatement(affectedTagIds))
 
   // D1 runs a batch as one transactional round trip, so relations and counters move together
   await db.batch(statements as unknown as Parameters<typeof db.batch>[0])

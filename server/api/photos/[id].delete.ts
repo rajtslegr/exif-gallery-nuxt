@@ -1,7 +1,10 @@
 import { blob } from '@nuxthub/blob'
 import { db } from '@nuxthub/db'
-import { eq, inArray, sql } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { purgeGalleryCache } from '../../utils/cache'
+import { dropEmptyTagsStatement, recountTagsStatement } from '../../utils/tag'
+
+type BatchStatement = Parameters<typeof db.batch>[0][number]
 
 export default eventHandler(async (event) => {
   await requireUserSession(event)
@@ -14,7 +17,6 @@ export default eventHandler(async (event) => {
     })
   }
 
-  // Get the photo record first
   const photo = await db.query.photo.findFirst({
     where: (photo, { eq }) => eq(photo.id, id),
   })
@@ -26,40 +28,22 @@ export default eventHandler(async (event) => {
     })
   }
 
-  // Delete files from hub
-  const formats = ['jpeg', 'webp', 'avif', 'thumbnail'] as const
-  const deletePromises = formats.map(async (format) => {
-    const pathname = photo[format]
-    if (pathname) {
-      try {
-        await blob.delete(pathname)
-      }
-      catch (error) {
-        console.error(`Failed to delete ${format} file (${pathname}):`, error)
-      }
-    }
+  const photoTags = await db.query.photoTag.findMany({
+    where: eq(schema.photoTag.photoId, id),
   })
+  const tagIds = photoTags.map(photoTag => photoTag.tagId)
 
-  await Promise.allSettled(deletePromises)
+  const statements: BatchStatement[] = [
+    db.delete(schema.photoTag).where(eq(schema.photoTag.photoId, id)),
+    db.delete(schema.photo).where(eq(schema.photo.id, id)),
+  ]
+
+  if (tagIds.length) {
+    statements.push(recountTagsStatement(tagIds), dropEmptyTagsStatement(tagIds))
+  }
 
   try {
-    const currentPhotoTags = await db.query.photoTag.findMany({
-      where: eq(schema.photoTag.photoId, id),
-    })
-
-    await db.delete(schema.photo).where(eq(schema.photo.id, id))
-
-    if (currentPhotoTags.length > 0) {
-      await db.delete(schema.photoTag)
-        .where(eq(schema.photoTag.photoId, id))
-
-      await db.update(schema.tag)
-        .set({ photoCount: sql`${schema.tag.photoCount} - 1` })
-        .where(inArray(schema.tag.id, currentPhotoTags.map(pt => pt.tagId)))
-
-      await db.delete(schema.tag)
-        .where(eq(schema.tag.photoCount, 0))
-    }
+    await db.batch(statements as unknown as Parameters<typeof db.batch>[0])
   }
   catch (error) {
     console.error('Failed to delete photo from database:', error)
@@ -68,6 +52,21 @@ export default eventHandler(async (event) => {
       statusMessage: 'Failed to delete photo',
     })
   }
+
+  // Blobs are removed only after the rows are gone: a failed DB delete must not
+  // leave a record pointing at files that no longer exist.
+  const formats = ['jpeg', 'webp', 'avif', 'thumbnail'] as const
+  await Promise.allSettled(formats.map(async (format) => {
+    const pathname = photo[format]
+    if (!pathname)
+      return
+    try {
+      await blob.delete(pathname)
+    }
+    catch (error) {
+      console.error(`Failed to delete ${format} file (${pathname}):`, error)
+    }
+  }))
 
   await purgeGalleryCache(event)
   return { success: true }
