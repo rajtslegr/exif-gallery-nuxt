@@ -66,7 +66,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Card class="p4 relative">
+  <Card class="p-4 relative">
     <Collapsible v-model:open="isOpen" class="flex flex-col gap-4">
       <div class="flex gap-2 justify-between lt-md:flex-col">
         <div class="flex flex-col gap-2">
@@ -127,7 +127,7 @@ onUnmounted(() => {
         </div>
       </div>
       <CollapsibleContent>
-        <Card class="p4">
+        <Card class="p-4">
           <UploadPhotoForm v-model="photo" />
         </Card>
       </CollapsibleContent>

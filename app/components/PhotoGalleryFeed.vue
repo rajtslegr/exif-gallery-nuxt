@@ -68,7 +68,7 @@ setupNavigation()
           class="w-full aspect-[4/3]"
         />
       </template>
-      <div v-if="!loading && !photos?.length" class="m-auto flex flex-col gap4 h-66vh items-center justify-center">
+      <div v-if="!loading && !photos?.length" class="m-auto flex flex-col gap-4 h-[66vh] items-center justify-center">
         <template v-if="route.query.search">
           <h2>{{ $t('search.no_results') }}</h2>
           <p class="text-muted-foreground">
