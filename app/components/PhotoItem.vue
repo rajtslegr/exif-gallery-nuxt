@@ -126,7 +126,7 @@ function deletePhoto(id: string) {
 
         <div
           class="text-sm flex gap-4"
-          :class="fullscreen ? 'justify-between' : 'md:flex-col md:gap-2 lt-md:justify-between'"
+          :class="fullscreen ? 'flex-wrap items-start' : 'md:flex-col md:gap-2 lt-md:justify-between'"
         >
           <!-- date and camera/lens info -->
           <div class="flex flex-col gap-2">
@@ -171,7 +171,8 @@ function deletePhoto(id: string) {
           <!-- exposure info -->
           <div
             v-if="photoWithExif"
-            class="leading-tight font-mono flex flex-col"
+            class="leading-tight font-mono flex"
+            :class="fullscreen ? 'flex-row flex-wrap gap-x-3 items-baseline' : 'flex-col'"
           >
             <div class="flex items-baseline">
               <span>{{ photo.focalLength ? toFixed(photo.focalLength, 1) : '--' }}mm</span>
