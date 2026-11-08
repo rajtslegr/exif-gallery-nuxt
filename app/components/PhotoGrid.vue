@@ -47,7 +47,7 @@ setupNavigation()
       <!-- Mirror of the tags rail so the photo grid itself stays centered -->
       <div class="flex-shrink-0 md:w-44 lt-md:hidden" />
       <div class="flex-auto h-min z-0">
-        <PhotoJustifiedGrid :photos="photos" :loading="loading" :limit="LIMIT" />
+        <PhotoSquareGrid :photos="photos" :loading="loading" :limit="LIMIT" />
       </div>
       <div class="flex-shrink-0 h-min right-4 top-29 fixed md:w-44 md:pointer-events-auto lt-md:pointer-events-none md:top-16 md:sticky lt-md:z-40">
         <ScrollAreaDynamic

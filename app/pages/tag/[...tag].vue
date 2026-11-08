@@ -42,7 +42,7 @@ setupNavigation()
       {{ tag }}
     </h3>
     <div v-if="photos && photos.length" class="mx-auto flex-[3] max-w-[1600px]">
-      <PhotoJustifiedGrid :photos="photos" :loading="loading" :limit="LIMIT" />
+      <PhotoSquareGrid :photos="photos" :loading="loading" :limit="LIMIT" />
     </div>
   </section>
 </template>
