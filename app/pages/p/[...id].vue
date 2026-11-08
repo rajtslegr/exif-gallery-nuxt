@@ -34,9 +34,12 @@ if (photoError.value) {
   })
 }
 
+// Resolved during setup: useRequestURL() is not available once unhead evaluates the getters
+const origin = useRequestURL().origin
+
 const photoImageUrl = computed(() => {
   const path = photo.value?.webp || photo.value?.jpeg || photo.value?.avif
-  return path ? new URL(`/photos/${path}`, useRequestURL().origin).href : undefined
+  return path ? `${origin}/photos/${path}` : undefined
 })
 
 const photoTitle = computed(() => photo.value?.title || photo.value?.fileName)
