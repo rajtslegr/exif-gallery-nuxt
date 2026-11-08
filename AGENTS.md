@@ -70,7 +70,7 @@ The application follows a Cloudflare-native architecture where all data lives at
 
 ### Database Schema Relationships
 
-The schema uses a modern normalized tag system (migrated from legacy comma-separated `photos.tags` field):
+The schema uses a normalized tag system (the legacy comma-separated `photos.tags` column has been dropped):
 
 ```
 photos (1) ←→ (N) photo_tags (N) ←→ (1) tags
