@@ -134,9 +134,9 @@ export const useNavigationStore = defineStore('navigation', () => {
       photoIds.value.push(...newPhotos.map(p => p.id))
       offset.value += newPhotos.length
     }
-    catch (err: any) {
-      console.error('Failed to load more photos:', err)
-      toast.error('Failed to load', { description: err?.data?.message || err?.message || 'Could not load more photos' })
+    catch (error) {
+      console.error('Failed to load more photos:', error)
+      toast.error('Failed to load', { description: getErrorMessage(error, 'Could not load more photos') })
     }
     finally {
       loading.value = false

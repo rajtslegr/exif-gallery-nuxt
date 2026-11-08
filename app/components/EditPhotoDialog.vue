@@ -62,10 +62,10 @@ async function saveChanges() {
 
     open.value = false
   }
-  catch (error: any) {
+  catch (error) {
     console.error(error)
     toast.error('Failed to update photo', {
-      description: error?.data?.message || error?.message || 'An error occurred',
+      description: getErrorMessage(error, 'An error occurred'),
     })
   }
   finally {

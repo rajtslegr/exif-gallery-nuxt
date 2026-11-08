@@ -3,6 +3,27 @@ import type { AIProviderConfig } from '../composables/useAIConfig'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 
+// Subset of the Gemini /models response we care about
+interface GeminiModelsResponse {
+  models?: {
+    name?: string
+    baseModelId?: string
+    displayName?: string
+    description?: string
+  }[]
+}
+
+// Subset of the OpenAI compatible /models response we care about
+interface OpenAIModelsResponse {
+  data?: {
+    id: string
+    name?: string
+    description?: string
+    created?: number
+    owned_by?: string
+  }[]
+}
+
 // Model info interface
 export interface AIModel {
   id: string
@@ -84,15 +105,17 @@ export async function fetchModels(
         return []
       }
 
-      const data = await response.json()
-
       // Gemini response shape: { models: [{ name: "models/gemini-1.5-flash-001", baseModelId: "gemini-1.5-flash", ... }] }
-      if (data.models && Array.isArray(data.models)) {
-        return data.models.map((m: any) => ({
-          id: m.baseModelId || m.name,
-          name: m.displayName || m.baseModelId,
-          description: m.description,
-        }))
+      const data = await response.json() as GeminiModelsResponse
+
+      if (Array.isArray(data.models)) {
+        return data.models
+          .map(model => ({
+            id: model.baseModelId || model.name || '',
+            name: model.displayName || model.baseModelId,
+            description: model.description,
+          }))
+          .filter(model => model.id)
       }
 
       console.error('[AI] Unexpected Gemini response format')
@@ -125,16 +148,16 @@ export async function fetchModels(
         return []
       }
 
-      const data = await response.json()
-
       // OpenAI response shape: { object: "list", data: [{ id: "gpt-4o", object: "model", ... }] }
-      if (data.data && Array.isArray(data.data)) {
-        return data.data.map((m: any) => ({
-          id: m.id,
-          name: m.name || m.id,
-          description: m.description,
-          created: m.created,
-          owned_by: m.owned_by,
+      const data = await response.json() as OpenAIModelsResponse
+
+      if (Array.isArray(data.data)) {
+        return data.data.map(model => ({
+          id: model.id,
+          name: model.name || model.id,
+          description: model.description,
+          created: model.created,
+          owned_by: model.owned_by,
         }))
       }
 

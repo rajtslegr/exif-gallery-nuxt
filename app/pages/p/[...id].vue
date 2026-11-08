@@ -26,7 +26,7 @@ const { loggedIn } = useUserSession()
 
 const { photo, error: photoError } = await usePhoto(id)
 if (photoError.value) {
-  const statusCode = (photoError.value as { statusCode?: number }).statusCode === 404 ? 404 : 500
+  const statusCode = getErrorStatus(photoError.value) === 404 ? 404 : 500
   throw createError({
     statusCode,
     statusMessage: statusCode === 404 ? 'Photo not found' : 'Failed to load photo',

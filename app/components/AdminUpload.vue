@@ -96,10 +96,10 @@ async function upload(fileEntry: FileEntry) {
       setFile(fileEntry)
     }
   }
-  catch (error: any) {
+  catch (error) {
     console.error(error)
     toast.error('Upload failed', {
-      description: error?.message || 'Upload failed',
+      description: getErrorMessage(error, 'Upload failed'),
     })
     fileEntry.uploadLoading = false
     setFile(fileEntry)

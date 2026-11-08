@@ -43,9 +43,9 @@ export function usePhotosInfinite(params?: MaybeRef<{
       state.value.hasMore.value = response.hasMore
       state.value.photos.value.push(...response.data.map(deserializePhoto))
     }
-    catch (err: any) {
-      console.error(err)
-      toast.error('An error occurred', { description: err?.data?.message || err?.message || 'Failed to get photos' })
+    catch (error) {
+      console.error(error)
+      toast.error('An error occurred', { description: getErrorMessage(error, 'Failed to get photos') })
     }
     finally {
       loading.value = false
@@ -86,8 +86,7 @@ export async function usePhoto(id: MaybeRef<string>) {
   watch(error, (err) => {
     if (!err)
       return
-    const fetchError = err as { data?: { message?: string }, message?: string }
-    toast.error('An error occurred', { description: fetchError.data?.message || fetchError.message || 'Failed to get photo' })
+    toast.error('An error occurred', { description: getErrorMessage(err, 'Failed to get photo') })
   }, { immediate: true })
 
   return {
