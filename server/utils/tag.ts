@@ -1,81 +1,98 @@
 import { db, schema } from '@nuxthub/db'
-import { eq, inArray, sql } from 'drizzle-orm'
+import { and, eq, inArray, sql } from 'drizzle-orm'
 
-export async function processPhotoTags(photoId: string, tags: string | null | undefined) {
-  if (tags === undefined || tags === null)
-    return
+const MAX_TAG_NAME_LENGTH = 64
 
-  const tagNames = tags.split(',').map(t => t.trim()).filter(Boolean)
+type BatchStatement = Parameters<typeof db.batch>[0][number]
 
-  if (tagNames.length === 0)
-    return
+function parseTagNames(tags: string) {
+  const names = tags
+    .split(',')
+    .map(name => name.trim().slice(0, MAX_TAG_NAME_LENGTH))
+    .filter(Boolean)
 
-  // Get current photo tags for decrementing counts
-  const currentPhotoTags = await db.query.photoTag.findMany({
-    where: eq(schema.photoTag.photoId, photoId),
-  })
+  return [...new Set(names)]
+}
 
-  // Get the tag IDs that need to be decremented
-  const tagIdsToDecrement = currentPhotoTags.map(pt => pt.tagId)
+function recountTagsStatement(tagIds: string[]) {
+  // Recompute instead of incrementing/decrementing so the counter self-heals
+  return db.update(schema.tag)
+    .set({
+      photoCount: sql`(select count(*) from ${schema.photoTag} where ${schema.photoTag.tagId} = ${schema.tag.id})`,
+    })
+    .where(inArray(schema.tag.id, tagIds))
+}
 
-  // First, find all existing tags in one query
+async function resolveTagIds(tagNames: string[]) {
+  if (!tagNames.length)
+    return []
+
+  const tagIdsByName = new Map<string, string>()
   const existingTags = await db.query.tag.findMany({
     where: inArray(schema.tag.name, tagNames),
   })
+  existingTags.forEach(tag => tagIdsByName.set(tag.name, tag.id))
 
-  // Create a map of tag names to their IDs for quick lookup
-  const tagMap = new Map(existingTags.map(tag => [tag.name, tag.id]))
-
-  // Prepare operations for new tags - set photoCount to 0 (will be incremented later)
-  const newTagOperations = tagNames
-    .filter(name => !tagMap.has(name))
-    .map(name => ({
-      name,
-      photoCount: 0, // Start with 0, will be incremented later
-    }))
-
-  // Insert new tags if any
-  if (newTagOperations.length > 0) {
-    const newTags = await db.insert(schema.tag)
-      .values(newTagOperations)
-      .returning()
-
-    // Add new tags to the map
-    newTags.forEach(tag => tagMap.set(tag.name, tag.id))
-  }
-
-  // Get all tag IDs that will be used
-  const allTagIds = tagNames.map(name => tagMap.get(name)!).filter(Boolean)
-
-  // Find which tags are being added and which are being kept
-  const addedTagIds = allTagIds.filter(id => !tagIdsToDecrement.includes(id))
-  const removedTagIds = tagIdsToDecrement.filter(id => !allTagIds.includes(id))
-
-  // Execute operations sequentially for better reliability
-  // 1. Delete existing photo-tag relationships
-  if (currentPhotoTags.length > 0) {
-    await db.delete(schema.photoTag)
-      .where(eq(schema.photoTag.photoId, photoId))
-  }
-
-  // 2. Decrement counts for removed tags
-  if (removedTagIds.length > 0) {
-    await db.update(schema.tag)
-      .set({ photoCount: sql`${schema.tag.photoCount} - 1` })
-      .where(inArray(schema.tag.id, removedTagIds))
-  }
-
-  // 3. Create new photo-tag relationships one by one to avoid conflicts
-  for (const tagId of allTagIds) {
-    await db.insert(schema.photoTag)
-      .values({ photoId, tagId })
+  const missingNames = tagNames.filter(name => !tagIdsByName.has(name))
+  if (missingNames.length) {
+    const createdTags = await db.insert(schema.tag)
+      .values(missingNames.map(name => ({ name })))
       .onConflictDoNothing()
+      .returning()
+    createdTags.forEach(tag => tagIdsByName.set(tag.name, tag.id))
+
+    // Names that lost an insert race are still in the table, fetch them
+    const unresolvedNames = tagNames.filter(name => !tagIdsByName.has(name))
+    if (unresolvedNames.length) {
+      const racedTags = await db.query.tag.findMany({
+        where: inArray(schema.tag.name, unresolvedNames),
+      })
+      racedTags.forEach(tag => tagIdsByName.set(tag.name, tag.id))
+    }
   }
 
-  // 4. Increment counts for added tags
-  if (addedTagIds.length > 0) {
-    await db.update(schema.tag)
-      .set({ photoCount: sql`${schema.tag.photoCount} + 1` })
-      .where(inArray(schema.tag.id, addedTagIds))
+  return tagNames
+    .map(name => tagIdsByName.get(name))
+    .filter((tagId): tagId is string => tagId !== undefined)
+}
+
+export async function processPhotoTags(photoId: string, tags: string | null | undefined) {
+  // undefined/null means "leave the tags alone", an empty string clears them
+  if (tags === undefined || tags === null)
+    return
+
+  const tagNames = parseTagNames(tags)
+
+  const currentPhotoTags = await db.query.photoTag.findMany({
+    where: eq(schema.photoTag.photoId, photoId),
+  })
+  const currentTagIds = currentPhotoTags.map(photoTag => photoTag.tagId)
+
+  const tagIds = await resolveTagIds(tagNames)
+  const affectedTagIds = [...new Set([...currentTagIds, ...tagIds])]
+
+  if (!affectedTagIds.length)
+    return
+
+  const statements: BatchStatement[] = [
+    db.delete(schema.photoTag).where(eq(schema.photoTag.photoId, photoId)),
+  ]
+
+  if (tagIds.length) {
+    statements.push(
+      db.insert(schema.photoTag)
+        .values(tagIds.map(tagId => ({ photoId, tagId })))
+        .onConflictDoNothing(),
+    )
   }
+
+  statements.push(
+    recountTagsStatement(affectedTagIds),
+    // Tags left without any photo are dropped so they stop showing up as filters
+    db.delete(schema.tag)
+      .where(and(inArray(schema.tag.id, affectedTagIds), eq(schema.tag.photoCount, 0))),
+  )
+
+  // D1 runs a batch as one transactional round trip, so relations and counters move together
+  await db.batch(statements as unknown as Parameters<typeof db.batch>[0])
 }
