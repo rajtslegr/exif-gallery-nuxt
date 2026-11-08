@@ -43,6 +43,13 @@
       "when": 1790413579555,
       "tag": "0005_shallow_bedlam",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1794162570876,
+      "tag": "0006_lean_loners",
+      "breakpoints": true
     }
   ]
 }

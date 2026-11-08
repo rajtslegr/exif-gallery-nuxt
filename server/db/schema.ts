@@ -45,6 +45,8 @@ export const photo = sqliteTable('photos', {
   index('idx_photos_taken_at').on(table.takenAt),
   index('idx_photos_created_at').on(table.createdAt),
   index('idx_photos_priority_order').on(table.priorityOrder),
+  index('idx_photos_make_model').on(table.make, table.model),
+  index('idx_photos_lens_model').on(table.lensModel),
 ])
 
 // New tag table for storing unique tags
