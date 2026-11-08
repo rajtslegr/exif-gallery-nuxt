@@ -74,6 +74,9 @@ export default eventHandler(async (event) => {
     ? schema.photo.createdAt
     : schema.photo.takenAt
   const orderExpression = order === 'asc' ? asc(orderColumn) : desc(orderColumn)
+  // Photos imported in bursts share a timestamp; the id tiebreaker keeps offset
+  // pagination deterministic instead of duplicating or skipping rows.
+  const orderExpressions = [orderExpression, desc(schema.photo.id)]
   const photoConditions = conditions.length > 0 ? and(...conditions) : undefined
   const queryLimit = limitNum + 1
 
@@ -100,7 +103,7 @@ export default eventHandler(async (event) => {
       .from(matchedPhotoIds)
       .innerJoin(schema.photo, eq(matchedPhotoIds.photoId, schema.photo.id))
       .where(photoConditions)
-      .orderBy(orderExpression)
+      .orderBy(...orderExpressions)
       .limit(queryLimit)
       .offset(offsetNum)
 
@@ -118,7 +121,7 @@ export default eventHandler(async (event) => {
     where: photoConditions,
     limit: queryLimit,
     offset: offsetNum,
-    orderBy: orderExpression,
+    orderBy: orderExpressions,
   })
   const hasMore = photos.length > limitNum
 
