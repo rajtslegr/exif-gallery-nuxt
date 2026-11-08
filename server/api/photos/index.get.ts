@@ -64,7 +64,15 @@ export default eventHandler(async (event) => {
           like(schema.photo.make, keywordStr),
           like(schema.photo.model, keywordStr),
           like(schema.photo.lensModel, keywordStr),
-          like(schema.photo.tags, keywordStr),
+          // Tags live in the tags/photo_tags tables; a subquery keeps the search
+          // working now that they are no longer duplicated on the photo row.
+          inArray(
+            schema.photo.id,
+            db.select({ photoId: schema.photoTag.photoId })
+              .from(schema.photoTag)
+              .innerJoin(schema.tag, eq(schema.photoTag.tagId, schema.tag.id))
+              .where(like(schema.tag.name, keywordStr)),
+          ),
         ),
       )
     }
