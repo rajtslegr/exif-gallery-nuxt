@@ -357,6 +357,7 @@ const { isSwiping, direction } = useSwipe(imageContainerRef, {
       :photo="photo"
       :logged-in="loggedIn"
       :fullscreen="true"
+      :priority="true"
       editable
       @deleted="onDeleted()"
     >
