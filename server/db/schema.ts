@@ -10,6 +10,7 @@ export const photo = sqliteTable('photos', {
   // R2
   jpeg: text('jpeg'),
   webp: text('webp'),
+  medium: text('medium'),
   avif: text('avif'),
   thumbnail: text('thumbnail'),
   // desc

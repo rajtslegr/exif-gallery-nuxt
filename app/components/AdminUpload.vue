@@ -155,6 +155,8 @@ async function processFileCompress(fileEntry: FileEntry) {
         break
       case 'thumbnail':
         formatsConfig.thumbnail = { target: 'thumbnail' }
+        // The grid uses the thumbnail at 1x and the medium webp on retina screens
+        formatsConfig.medium = { target: 'medium', resizeOptions: { width: 1000 }, encodeOptions: { quality: 0.8 } }
         break
     }
   }

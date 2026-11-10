@@ -6,6 +6,12 @@ const { photos, loading, limit = 36 } = defineProps<{
 }>()
 
 // Grid tiles are ~400px, so the thumbnail is always the cheapest sharp-enough source
+function photoSrcset(photo: IPhoto) {
+  if (!photo.thumbnail || !photo.medium)
+    return undefined
+  return `/photos/${photo.thumbnail} 1x, /photos/${photo.medium} 2x`
+}
+
 function photoSrc(photo: IPhoto) {
   const path = photo.thumbnail || photo.webp || photo.jpeg || photo.avif
   if (!path)
@@ -17,7 +23,7 @@ function photoSrc(photo: IPhoto) {
 <template>
   <div class="gap-px grid grid-cols-2 md:gap-1 2xl:grid-cols-4 md:grid-cols-3">
     <div
-      v-for="photo in photos"
+      v-for="(photo, index) in photos"
       :key="photo.id"
       class="aspect-square relative overflow-hidden"
     >
@@ -28,9 +34,11 @@ function photoSrc(photo: IPhoto) {
         >
           <img
             :src="`/photos/${photoSrc(photo)}`"
+            :srcset="photoSrcset(photo)"
             class="h-full w-full block object-contain"
             :alt="photo.semanticDescription || photo.caption || photo.title"
-            loading="lazy"
+            :loading="index < 6 ? 'eager' : 'lazy'"
+            :fetchpriority="index === 0 ? 'high' : undefined"
           >
         </NuxtLinkLocale>
       </PhotoItemCard>

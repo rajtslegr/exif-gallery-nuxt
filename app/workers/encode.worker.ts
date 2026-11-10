@@ -22,7 +22,7 @@ globalThis.onmessage = async (e) => {
     let dataToEncode = imageData
 
     // Auto resize: when the short edge is >= 2880, scale it down to 2160
-    if (options.target !== 'thumbnail' && options.autoResize) {
+    if (options.target !== 'thumbnail' && options.target !== 'medium' && options.autoResize) {
       const minDimension = Math.min(imageData.width, imageData.height)
       if (minDimension >= 2880) {
         let targetWidth: number | undefined
@@ -60,6 +60,19 @@ globalThis.onmessage = async (e) => {
       const avifData = options.encodeOptions ? await encodeAvif(dataToEncode, options.encodeOptions) : await encodeAvif(dataToEncode)
       result = new File([avifData], changeFileExtension(filename, 'avif'), {
         type: 'image/avif',
+      })
+    }
+    else if (options.target === 'medium') {
+      // Long edge capped, keeps the aspect ratio; used for 2x tiles in the grid
+      const longEdge = options.resizeOptions?.width ?? 1000
+      const scale = Math.min(1, longEdge / Math.max(imageData.width, imageData.height))
+      const mediumData = await resize(imageData, {
+        width: Math.max(1, Math.round(imageData.width * scale)),
+        height: Math.max(1, Math.round(imageData.height * scale)),
+      })
+      const medium = await encodeWebp(mediumData, options.encodeOptions)
+      result = new File([medium], changeFileExtension(filename, '_medium.webp'), {
+        type: 'image/webp',
       })
     }
     else if (options.target === 'thumbnail') {

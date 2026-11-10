@@ -64,6 +64,13 @@
       "when": 1794293434788,
       "tag": "0008_perfect_johnny_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1794301936267,
+      "tag": "0009_thin_randall",
+      "breakpoints": true
     }
   ]
 }
