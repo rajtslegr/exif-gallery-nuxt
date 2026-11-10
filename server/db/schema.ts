@@ -36,8 +36,8 @@ export const photo = sqliteTable('photos', {
   // photo config
   priorityOrder: real('priority_order'),
   // sql default
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
 }, table => [
   index('idx_photos_taken_at').on(table.takenAt),
   index('idx_photos_created_at').on(table.createdAt),
@@ -51,7 +51,7 @@ export const tag = sqliteTable('tags', {
   id: text('id').primaryKey().$defaultFn(() => createCuid(8)),
   name: text('name').notNull().unique(),
   photoCount: integer('photo_count').notNull().default(0),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
+  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
 }, table => [
   index('idx_tags_photo_count').on(table.photoCount),
 ])
@@ -64,7 +64,7 @@ export const photoTag = sqliteTable('photo_tags', {
   tagId: text('tag_id')
     .notNull()
     .references(() => tag.id, { onDelete: 'cascade' }),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
+  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
 }, table => [
   primaryKey({ columns: [table.photoId, table.tagId] }),
   index('idx_photo_tags_photo_id').on(table.photoId),
