@@ -30,13 +30,13 @@ function photoSrc(photo: IPhoto) {
       <PhotoItemCard>
         <NuxtLinkLocale
           :to="`/p/${photo.id}`"
-          class="h-full w-full block"
+          class="outline-none h-full w-full block ring-primary focus-visible:ring-2"
         >
           <img
             :src="`/photos/${photoSrc(photo)}`"
             :srcset="photoSrcset(photo)"
             class="h-full w-full block object-contain"
-            :alt="photo.semanticDescription || photo.caption || photo.title"
+            :alt="photo.semanticDescription || photo.caption || photo.title || photo.fileName"
             :loading="index < 6 ? 'eager' : 'lazy'"
             :fetchpriority="index === 0 ? 'high' : undefined"
           >
