@@ -5,6 +5,10 @@ defineProps<{
   fullscreen?: boolean
   priority?: boolean
 }>()
+
+// The photo record arrives with SSR, but the file itself still has to download;
+// the parent decides what to do until then (the fullscreen page covers it).
+const emit = defineEmits<{ loaded: [] }>()
 </script>
 
 <template>
@@ -23,6 +27,8 @@ defineProps<{
         class="m-auto h-full object-contain"
         :fetchpriority="priority ? 'high' : undefined"
         :alt="fullscreen ? (photo.semanticDescription || photo.caption || photo.title || '') : ''"
+        @load="emit('loaded')"
+        @error="emit('loaded')"
       >
     </picture>
   </div>

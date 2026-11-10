@@ -11,10 +11,19 @@ const {
   fullscreen?: boolean
   priority?: boolean
 }>()
+
+const emit = defineEmits<{ loaded: [] }>()
 </script>
 
 <template>
   <slot>
-    <PhotoItemCardDefault :photo="photo" :mini="mini" :fullscreen="fullscreen" :priority="priority" :class="cn({ 'h-full': mini && !fullscreen }, className)" />
+    <PhotoItemCardDefault
+      :photo="photo"
+      :mini="mini"
+      :fullscreen="fullscreen"
+      :priority="priority"
+      :class="cn({ 'h-full': mini && !fullscreen }, className)"
+      @loaded="emit('loaded')"
+    />
   </slot>
 </template>

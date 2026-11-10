@@ -14,6 +14,7 @@ const {
 const emit = defineEmits<{
   deleted: [id: string]
   update: [photo: IPhoto]
+  imageLoaded: []
 }>()
 
 const photo = defineModel<IPhoto>('photo', { required: true })
@@ -51,7 +52,13 @@ function deletePhoto(id: string) {
   <div :class="[fullscreen ? 'h-full w-full flex flex-col' : 'flex gap-1 lt-md:flex-col lg:gap-8 md:gap-4']">
     <div v-if="fullscreen" class="flex-1 min-h-0 relative">
       <div class="h-full w-full md:px-20">
-        <PhotoItemCard :photo="photo" fullscreen :priority="priority" class="h-full w-full" />
+        <PhotoItemCard
+          :photo="photo"
+          fullscreen
+          :priority="priority"
+          class="h-full w-full"
+          @loaded="emit('imageLoaded')"
+        />
       </div>
       <slot name="image-overlay" />
     </div>

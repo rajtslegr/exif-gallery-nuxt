@@ -9,10 +9,16 @@ definePageMeta({
 })
 
 const route = useRoute()
+const imageReady = ref(false)
 const router = useRouter()
 const localePath = useLocalePath()
 
 const id = ref(route.params.id?.[0] || '')
+
+// Every next/prev navigates to another photo, which has to load again
+watch(id, () => {
+  imageReady.value = false
+})
 if (!id.value)
   throw createError({ statusCode: 404, statusMessage: 'Photo not found', fatal: true })
 
@@ -360,6 +366,7 @@ const { isSwiping, direction } = useSwipe(imageContainerRef, {
       :priority="true"
       editable
       @deleted="onDeleted()"
+      @image-loaded="imageReady = true"
     >
       <template #image-overlay>
         <div
@@ -408,6 +415,9 @@ const { isSwiping, direction } = useSwipe(imageContainerRef, {
         />
       </template>
     </PhotoItem>
+    <div v-if="!imageReady" class="bg-background flex items-center inset-0 justify-center absolute z-20">
+      <Skeleton class="h-full w-full" />
+    </div>
   </section>
   <section v-else>
     <Skeleton class="w-full aspect-[4/3]" />
