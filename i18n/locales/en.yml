@@ -5,6 +5,8 @@ go_to_admin: Go To Admin Panel
 image_detail: Image detail
 go_to_upload: Go To Upload Photos
 button:
+  previous_photo: Previous photo
+  next_photo: Next photo
   edit: Edit
   delete: Delete
   view_photo: View Photo

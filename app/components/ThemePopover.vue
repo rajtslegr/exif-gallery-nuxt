@@ -14,6 +14,7 @@ const attrs = useAttrs()
           <Button
             variant="ghost"
             size="icon"
+            :aria-label="$t('header.theme')"
             v-bind="attrs"
           >
             <div class="i-lucide-paintbrush" />

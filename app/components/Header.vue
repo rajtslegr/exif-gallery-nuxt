@@ -40,14 +40,14 @@ watch(() => route.name, (routeName) => {
     class="px-4 border-b bg-background/60 flex h-12 w-full transition-transform duration-300 items-center top-0 justify-between sticky z-50 backdrop-blur"
     :class="fullscreen ? (idle ? '-translate-y-full op-0 pointer-events-none' : 'translate-y-0 op-100') : ''"
   >
-    <nav div class="flex flex-auto gap-2 min-w-0 items-center justify-items-start">
+    <nav class="flex flex-auto gap-2 min-w-0 items-center justify-items-start">
       <NuxtLinkLocale to="/" class="font-medium flex-[0_1_auto] min-w-0 truncate">
         {{ config.public.title || $t('title') }}
       </NuxtLinkLocale>
       <HeaderBackButton v-if="fullscreen" />
       <HeaderSearchButton v-if="showSearchButton" />
     </nav>
-    <nav div class="flex flex-auto min-w-0 items-center justify-items-start">
+    <nav class="flex flex-auto min-w-0 items-center justify-items-start">
       <TooltipIconButton
         v-for="link in links"
         :key="link.to"
@@ -55,6 +55,8 @@ watch(() => route.name, (routeName) => {
       >
         <NuxtLink
           :to="link.to"
+          :aria-label="link.tooltip"
+          :aria-current="path === link.to ? 'page' : undefined"
           class="text-sm font-medium px-4 text-center rounded-md flex h-7 transition-colors items-center justify-center data-[active=true]:text-primary hover:text-primary data-[active=true]:bg-muted"
           :data-active="path === link.to"
         >

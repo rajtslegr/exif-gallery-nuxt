@@ -368,6 +368,7 @@ const { isSwiping, direction } = useSwipe(imageContainerRef, {
         >
           <Button
             variant="ghost"
+            :aria-label="$t('button.previous_photo')"
             class="text-xl text-foreground/67 rounded-lg bg-background/30 size-16 shadow-lg transition-all duration-300 backdrop-blur hover:bg-background/50"
             :class="cn(
               (isSwiping ? direction === 'right' : !idle) ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0 pointer-events-none',
@@ -384,6 +385,7 @@ const { isSwiping, direction } = useSwipe(imageContainerRef, {
         >
           <ProButton
             variant="ghost"
+            :aria-label="$t('button.next_photo')"
             class="text-xl text-foreground/67 rounded-lg bg-background/30 size-16 shadow-lg transition-all duration-300 backdrop-blur hover:bg-background/50"
             :class="cn(
               (isSwiping ? direction === 'left' : !idle) ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none',

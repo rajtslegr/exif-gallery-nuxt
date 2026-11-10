@@ -33,6 +33,7 @@ const attrs = useAttrs()
       <slot>
         <Button
           v-bind="{ ...attrs, ...buttonProps }"
+          :aria-label="label"
         >
           <Spinner v-if="loading" class="animate-spin" />
           <div :class="icon" />
