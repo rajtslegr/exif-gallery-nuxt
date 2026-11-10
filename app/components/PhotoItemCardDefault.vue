@@ -22,7 +22,7 @@ defineProps<{
         :src="`/photos/${photo.jpeg || photo.webp || photo.avif}`"
         class="m-auto h-full object-contain"
         :fetchpriority="priority ? 'high' : undefined"
-        :alt="photo.semanticDescription || photo.caption || photo.title"
+        :alt="fullscreen ? (photo.semanticDescription || photo.caption || photo.title || '') : ''"
       >
     </picture>
   </div>

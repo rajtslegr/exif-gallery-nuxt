@@ -5,6 +5,12 @@ const { photos, loading, limit = 36 } = defineProps<{
   limit?: number
 }>()
 
+// Accessible name for the tile link; the image itself is decorative so the browser
+// never paints alt text inside the tile while the file is still downloading.
+function photoLabel(photo: IPhoto) {
+  return photo.semanticDescription || photo.caption || photo.title || photo.fileName || 'Photo'
+}
+
 // Grid tiles are ~400px, so the thumbnail is always the cheapest sharp-enough source
 function photoSrc(photo: IPhoto) {
   const path = photo.thumbnail || photo.webp || photo.jpeg || photo.avif
@@ -24,12 +30,13 @@ function photoSrc(photo: IPhoto) {
       <PhotoItemCard>
         <NuxtLinkLocale
           :to="`/p/${photo.id}`"
+          :aria-label="photoLabel(photo)"
           class="outline-none h-full w-full block ring-primary focus-visible:ring-2"
         >
           <img
             :src="`/photos/${photoSrc(photo)}`"
             class="h-full w-full block object-contain"
-            :alt="photo.semanticDescription || photo.caption || photo.title || photo.fileName"
+            alt=""
             :loading="index < 6 ? 'eager' : 'lazy'"
             :fetchpriority="index === 0 ? 'high' : undefined"
           >
