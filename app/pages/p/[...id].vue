@@ -44,6 +44,7 @@ const photoImageUrl = computed(() => {
 
 const photoTitle = computed(() => photo.value?.title || photo.value?.fileName)
 const photoDescription = computed(() => photo.value?.caption || photo.value?.semanticDescription)
+const photoUrl = computed(() => photo.value ? `${origin}/p/${photo.value.id}` : undefined)
 
 useSeoMeta({
   title: () => photoTitle.value,
@@ -51,9 +52,14 @@ useSeoMeta({
   ogTitle: () => photoTitle.value,
   ogDescription: () => photoDescription.value,
   ogImage: () => photoImageUrl.value,
+  ogUrl: () => photoUrl.value,
   ogType: 'article',
   twitterCard: 'summary_large_image',
 })
+
+useHead(() => ({
+  link: photoUrl.value ? [{ rel: 'canonical', href: photoUrl.value }] : [],
+}))
 
 const pStore = usePhotosStore()
 const photosStore = pStore.photosStore
