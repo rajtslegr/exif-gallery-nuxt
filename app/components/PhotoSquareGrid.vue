@@ -6,12 +6,6 @@ const { photos, loading, limit = 36 } = defineProps<{
 }>()
 
 // Grid tiles are ~400px, so the thumbnail is always the cheapest sharp-enough source
-function photoSrcset(photo: IPhoto) {
-  if (!photo.thumbnail || !photo.medium)
-    return undefined
-  return `/photos/${photo.thumbnail} 1x, /photos/${photo.medium} 2x`
-}
-
 function photoSrc(photo: IPhoto) {
   const path = photo.thumbnail || photo.webp || photo.jpeg || photo.avif
   if (!path)
@@ -34,7 +28,6 @@ function photoSrc(photo: IPhoto) {
         >
           <img
             :src="`/photos/${photoSrc(photo)}`"
-            :srcset="photoSrcset(photo)"
             class="h-full w-full block object-contain"
             :alt="photo.semanticDescription || photo.caption || photo.title || photo.fileName"
             :loading="index < 6 ? 'eager' : 'lazy'"

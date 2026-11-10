@@ -55,7 +55,7 @@ export default eventHandler(async (event) => {
 
   // Blobs are removed only after the rows are gone: a failed DB delete must not
   // leave a record pointing at files that no longer exist.
-  const formats = ['jpeg', 'webp', 'avif', 'medium', 'thumbnail'] as const
+  const formats = ['jpeg', 'webp', 'avif', 'thumbnail'] as const
   await Promise.allSettled(formats.map(async (format) => {
     const pathname = photo[format]
     if (!pathname)

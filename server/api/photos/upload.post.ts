@@ -5,7 +5,7 @@ import { purgeGalleryCache } from '../../utils/cache'
 
 interface UploadFile {
   file: File
-  type: 'jpeg' | 'webp' | 'avif' | 'medium' | 'thumbnail'
+  type: 'jpeg' | 'webp' | 'avif' | 'thumbnail'
 }
 
 export default eventHandler(async (event) => {
@@ -14,7 +14,7 @@ export default eventHandler(async (event) => {
   const formData = await readFormData(event)
   const files: UploadFile[] = []
 
-  const formats = ['jpeg', 'webp', 'avif', 'medium', 'thumbnail'] as const
+  const formats = ['jpeg', 'webp', 'avif', 'thumbnail'] as const
   formats.forEach((format) => {
     const file = formData.get(format)
     if (file instanceof File) {
@@ -42,7 +42,7 @@ export default eventHandler(async (event) => {
 
   interface UploadResultSuccess {
     success: true
-    type: 'jpeg' | 'webp' | 'avif' | 'medium' | 'thumbnail'
+    type: 'jpeg' | 'webp' | 'avif' | 'thumbnail'
     pathname: string
   }
   interface UploadResultError {

@@ -23,24 +23,17 @@ interface Avif {
   autoResize?: boolean
 }
 
-interface Medium {
-  target: 'medium'
-  encodeOptions?: Partial<WebpOption>
-  resizeOptions?: Partial<ResizeOption> & { width: number }
-}
-
 interface Thumbnail {
   target: 'thumbnail'
   encodeOptions?: Partial<JpegOption>
   resizeOptions?: Partial<ResizeOption> & { width: number, height: number }
 }
 
-export type CompressOptions = Jpeg | Webp | Avif | Medium | Thumbnail
+export type CompressOptions = Jpeg | Webp | Avif | Thumbnail
 export interface CompressMultiResultOption {
   jpeg?: Jpeg | boolean
   webp?: Webp | boolean
   avif?: Avif | boolean
-  medium?: Medium | boolean
   thumbnail?: Thumbnail | boolean
 }
 
@@ -48,7 +41,6 @@ export interface compressFiles {
   jpeg?: File | 'loading'
   webp?: File | 'loading'
   avif?: File | 'loading'
-  medium?: File | 'loading'
   thumbnail?: File | 'loading'
 }
 
