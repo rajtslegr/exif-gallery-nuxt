@@ -2,6 +2,7 @@
 const localePath = useLocalePath()
 const { t } = useI18n()
 const { isGridDefault } = useDefaultView()
+const { loggedIn } = useUserSession()
 
 // The default view lives at `/`, the other view has its own explicit route
 const links = computed(() => [
@@ -21,7 +22,7 @@ const links = computed(() => [
 <template>
   <Header
     :links="links"
-    :show-admin="true"
+    :show-admin="loggedIn"
   />
   <slot />
 </template>

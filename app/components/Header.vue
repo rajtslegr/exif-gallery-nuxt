@@ -65,7 +65,7 @@ watch(() => route.name, (routeName) => {
       </TooltipIconButton>
     </nav>
     <nav class="flex items-center">
-      <NuxtLinkLocale v-if="showAdmin" to="/admin">
+      <NuxtLinkLocale v-if="showAdmin && loggedIn" to="/admin">
         <TooltipIconButton :label="$t('header.admin')" icon="i-lucide-server-cog op-50" variant="ghost" size="icon" />
       </NuxtLinkLocale>
       <TooltipIconButton

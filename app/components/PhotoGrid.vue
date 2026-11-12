@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { cn } from '~/lib/utils'
 
+const { loggedIn } = useUserSession()
 const isDrawerOpen = ref(false)
 const route = useRoute()
 const { orderBy, order } = usePhotoSort()
@@ -70,7 +71,7 @@ setupNavigation()
       </template>
       <template v-else>
         <h2>{{ $t('no_photos') }}</h2>
-        <NuxtLinkLocale to="/admin">
+        <NuxtLinkLocale v-if="loggedIn" to="/admin">
           <Button>{{ $t('go_to_admin') }}</Button>
         </NuxtLinkLocale>
       </template>
