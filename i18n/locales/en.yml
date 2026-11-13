@@ -56,7 +56,6 @@ login_form:
   password_placeholder: Enter password
   login_button: Login
   back_to_gallery: Back to Gallery
-  demo: Demo Page
 compression_config:
   title: Image Compression
   enable: Enable image compression
