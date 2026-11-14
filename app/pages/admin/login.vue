@@ -11,11 +11,7 @@ if (loggedIn.value)
 </script>
 
 <template>
-  <div class="p-4 flex flex-col gap-4 h-80dvh items-center justify-center">
+  <div class="p-4 flex flex-col gap-4 min-h-[66dvh] items-center justify-center">
     <LoginForm @logged-in="navigate()" />
   </div>
 </template>
-
-<style scoped>
-
-</style>

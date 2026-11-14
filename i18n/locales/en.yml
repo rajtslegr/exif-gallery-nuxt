@@ -3,7 +3,7 @@ description: A full-stack photo album solution that integrates AI intelligent pr
 no_photos: No Photos
 go_to_admin: Go To Admin Panel
 image_detail: Image detail
-go_to_upload: Go To Upload Photos
+go_to_upload: Upload Photos
 button:
   previous_photo: Previous photo
   next_photo: Next photo
@@ -60,7 +60,6 @@ login_form:
   login_button: Login
   back_to_gallery: Back to Gallery
 compression_config:
-  title: Image Compression
   enable: Enable image compression
   info: Image compression can speed up page loading, but will slightly reduce image quality, and file's exif will be removed
   auto_resize: Auto Resize
@@ -72,7 +71,6 @@ compression_config:
   avif_info: AVIF format has a better algorithm, but compression time is much longer
   thumbnail: Generate thumbnail
 ai_config:
-  title: AI Features
   enable: Enable AI feature extraction
   providers: AI Providers
   provider: AI Provider
@@ -116,6 +114,8 @@ upload_photo:
   ai_error: AI Analysis Failed
   ai_error_retry: Please try again
   upload_all: Upload All
+  show_details: Show details
+  hide_details: Hide details
 edit_photo:
   title: Edit Photo
   cancel: Cancel

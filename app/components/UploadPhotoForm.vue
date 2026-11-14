@@ -6,7 +6,7 @@ const photo = defineModel<IPhotoForm>({ required: true })
   <div class="flex flex-col gap-4">
     <!-- Basic Information -->
     <div>
-      <h3 class="text-lg font-medium">
+      <h3 class="text-sm text-muted-foreground font-medium">
         {{ $t('basic_info.title') }}
       </h3>
       <div class="gap-x-4 gap-y-1 grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2">
@@ -37,7 +37,7 @@ const photo = defineModel<IPhotoForm>({ required: true })
 
     <!-- Camera and Lens -->
     <div>
-      <h3 class="text-lg font-medium">
+      <h3 class="text-sm text-muted-foreground font-medium">
         {{ $t('camera_lens.title') }}
       </h3>
       <div class="gap-x-4 gap-y-1 grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2">
@@ -70,7 +70,7 @@ const photo = defineModel<IPhotoForm>({ required: true })
 
     <!-- Exposure Settings -->
     <div>
-      <h3 class="text-lg font-medium">
+      <h3 class="text-sm text-muted-foreground font-medium">
         {{ $t('exposure.title') }}
       </h3>
       <div class="gap-x-4 gap-y-1 grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2">
@@ -95,7 +95,7 @@ const photo = defineModel<IPhotoForm>({ required: true })
 
     <!-- Location Information -->
     <div>
-      <h3 class="text-lg font-medium">
+      <h3 class="text-sm text-muted-foreground font-medium">
         {{ $t('location.title') }}
       </h3>
       <div class="gap-x-4 gap-y-1 grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2">
@@ -120,7 +120,7 @@ const photo = defineModel<IPhotoForm>({ required: true })
 
     <!-- Gallery ordering -->
     <div>
-      <h3 class="text-lg font-medium">
+      <h3 class="text-sm text-muted-foreground font-medium">
         {{ $t('sort.priority') }}
       </h3>
       <div class="gap-x-4 gap-y-1 grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2">

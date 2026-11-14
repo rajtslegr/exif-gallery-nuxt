@@ -12,8 +12,13 @@ const { photos, hasMore, loadMore, loading } = usePhotosInfinite(params, LIMIT)
 
 useInfiniteScroll(window, loadMore, { distance: 320, canLoadMore: () => hasMore.value })
 
-function getPhotoThumbnail(photo: IPhoto) {
-  const path = photo.thumbnail || photo.jpeg || photo.webp || photo.avif
+function photoLabel(photo: IPhoto) {
+  return photo.semanticDescription || photo.caption || photo.title || photo.fileName || 'Photo'
+}
+
+// Tiles are small, so the thumbnail is always the cheapest sharp-enough source
+function photoSrc(photo: IPhoto) {
+  const path = photo.thumbnail || photo.webp || photo.jpeg || photo.avif
   if (!path)
     throw new Error('Photo has no Image File')
   return path
@@ -27,87 +32,72 @@ function deletePhoto(id: string) {
 }
 
 const selectedPhoto = ref<IPhoto>()
+const editOpen = ref(false)
 
 function openEditDialog(photo: IPhoto) {
   selectedPhoto.value = photo
+  editOpen.value = true
 }
 </script>
 
 <template>
-  <div class="p-4 flex flex-col gap-4">
-    <NuxtLinkLocale to="/admin/upload">
-      <div class="group p-4 border border-muted rounded-lg bg-background flex flex-col w-full items-center justify-center relative overflow-hidden md:shadow-xl">
-        <span class="text-5xl text-transparent leading-none font-semibold my-8 text-center pointer-events-none whitespace-pre-wrap from-black to-gray-300/80 bg-gradient-to-b bg-clip-text dark:from-white dark:to-slate-900/10">
-          {{ $t('go_to_upload') }}
-        </span>
-        <BorderBeam
-          color-from="oklch(var(--primary))"
-          color-to="oklch(var(--primary-foreground))"
-          :duration="2"
-          :border-width="4"
-        />
-      </div>
-    </NuxtLinkLocale>
+  <div class="mx-auto p-4 flex flex-col gap-4 max-w-[1600px]">
+    <div class="flex gap-2 items-center justify-between">
+      <h1 class="text-xl font-medium">
+        {{ $t('header.admin_dashboard') }}
+      </h1>
+      <NuxtLinkLocale to="/admin/upload">
+        <Button variant="outline" size="sm">
+          <div class="i-lucide-upload" />
+          <span>{{ $t('go_to_upload') }}</span>
+        </Button>
+      </NuxtLinkLocale>
+    </div>
     <div
-      v-if="photos && photos.length"
-      class="gap-2px grid grid-cols-3 2xl:grid-cols-8 lg:grid-cols-5 sm:grid-cols-4 xl:grid-cols-6"
+      v-if="(photos && photos.length) || loading"
+      class="gap-px grid grid-cols-3 md:gap-1 2xl:grid-cols-8 lg:grid-cols-5 sm:grid-cols-4 xl:grid-cols-6"
     >
       <div
         v-for="photo in photos"
         :key="photo.id"
-        class="group p-2 border rounded-lg border-dashed relative hover:bg-muted"
+        class="group aspect-square relative overflow-hidden"
       >
-        <div class="rounded-lg flex h-auto w-full aspect-[4/3]">
-          <div class="gap-1 hidden right--0 top--0 absolute z-[9999] group-hover:flex lt-md:translate-y--100% sm:right-1 sm:top-1">
-            <EditPhotoDialog
-              :photo="selectedPhoto"
-            >
-              <Button
-                size="icon"
-                @click="openEditDialog(photo)"
-              >
-                <div class="i-lucide-edit" />
-              </Button>
-            </EditPhotoDialog>
-            <ProButton
-              :loading="deletingPhoto === photo.id"
-              :disabled="!loggedIn"
-              variant="destructive"
-              size="icon"
-              @click="loggedIn && deletePhoto(photo.id)"
-            >
-              <div class="i-lucide-trash" />
-            </ProButton>
-          </div>
-          <img
-            v-if="photo"
-            :src="`/photos/${getPhotoThumbnail(photo)}`"
-            class="m-auto rounded-md shadow-black/50 shadow-lg object-cover"
-            :class="photo.aspectRatio ? photo.aspectRatio > (4 / 3) ? 'w-full h-auto' : 'h-full w-auto' : 'h-full w-full'"
-            :alt="photo.semanticDescription || photo.caption || photo.title"
-          >
-        </div>
-        <div class="mt-2">
-          <div class="flex gap-2 items-center justify-center">
-            <span> {{ photo.title }}</span>
-          </div>
-          <div class="flex gap-2 items-center justify-center">
-            <span class="text-sm text-muted-foreground">{{ photo.caption }}</span>
-          </div>
-          <div class="flex flex-wrap gap-x-1 gap-y-0 justify-center">
-            <Tag
-              v-for="tag in photo.tags"
-              :key="tag" :label="tag"
-              class="text-sm text-muted-foreground"
-            />
-          </div>
+        <img
+          :src="`/photos/${photoSrc(photo)}`"
+          class="h-full w-full block object-contain"
+          :alt="photoLabel(photo)"
+          loading="lazy"
+        >
+        <div class="p-0.5 rounded-lg bg-background/60 op-100 flex gap-1 right-1 top-1 absolute backdrop-blur md:op-0 md:group-focus-within:op-100 md:group-hover:op-100">
+          <TooltipIconButton
+            icon="i-lucide-edit"
+            :label="$t('button.edit')"
+            variant="ghost"
+            size="icon"
+            @click="openEditDialog(photo)"
+          />
+          <TooltipIconButton
+            icon="i-lucide-trash"
+            :label="$t('button.delete')"
+            variant="ghost"
+            size="icon"
+            :loading="deletingPhoto === photo.id"
+            :disabled="!loggedIn"
+            @click="loggedIn && deletePhoto(photo.id)"
+          />
         </div>
       </div>
       <template v-if="loading">
-        <div v-for="i in LIMIT" :key="i">
-          <Skeleton class="rounded-lg w-full aspect-[4/3]" />
-        </div>
+        <Skeleton
+          v-for="i in LIMIT"
+          :key="i"
+          class="w-full aspect-square"
+        />
       </template>
     </div>
   </div>
+  <EditPhotoDialog
+    v-model:open="editOpen"
+    :photo="selectedPhoto"
+  />
 </template>

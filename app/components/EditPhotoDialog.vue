@@ -112,7 +112,7 @@ async function saveChanges() {
 
 <template>
   <Dialog v-model:open="open">
-    <DialogTrigger as-child>
+    <DialogTrigger v-if="$slots.default" as-child>
       <slot />
     </DialogTrigger>
     <DialogContent class="grid-rows-[auto_minmax(0,1fr)_auto] max-h-[90dvh] max-w-[90dvw] sm:max-w-[90dvw] xl:max-w-300">
@@ -130,9 +130,9 @@ async function saveChanges() {
             hide-action
           />
         </section>
-        <Card v-if="editedPhoto" :key="editedPhoto.id" class="p-4">
+        <div v-if="editedPhoto" :key="editedPhoto.id" class="pt-4 border-t">
           <UploadPhotoForm v-model="editedPhotoForm" />
-        </Card>
+        </div>
       </div>
       <DialogFooter class="flex flex-row gap-4 items-center justify-center">
         <Button variant="outline" @click="open = false">

@@ -280,12 +280,12 @@ watch(() => props.open, (isOpen) => {
         </div>
 
         <!-- Connection test result -->
-        <div v-if="testConnectionResult" class="text-xs p-2 border rounded">
-          <div v-if="testConnectionResult.success" class="text-green-600 flex items-center">
+        <div v-if="testConnectionResult" class="text-xs p-2 rounded-lg bg-muted">
+          <div v-if="testConnectionResult.success" class="text-primary flex items-center">
             <div class="i-lucide-check-circle mr-1" />
             {{ $t('ai_config.connection_success') }} ({{ testConnectionResult.modelCount }} {{ $t('ai_config.models') }})
           </div>
-          <div v-else class="text-red-600 flex items-center">
+          <div v-else class="text-destructive flex items-center">
             <div class="i-lucide-x-circle mr-1" />
             {{ $t('ai_config.connection_failed') }}: {{ testConnectionResult.error }}
           </div>

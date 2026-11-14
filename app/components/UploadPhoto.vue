@@ -66,85 +66,90 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Card class="p-4 relative">
-    <Collapsible v-model:open="isOpen" class="flex flex-col gap-4">
-      <div class="flex gap-2 justify-between lt-md:flex-col">
-        <div class="flex flex-col gap-2">
-          <div class="flex flex-wrap gap-2 items-center">
-            <span class="mr-2">{{ file.name }}</span>
-            <Tag
-              v-for="tag in (photo.tags ? photo.tags.split(',') : [])"
-              :key="tag"
-              :label="tag"
-            />
-          </div>
-          <div class="flex flex-wrap gap-4 items-center">
-            <span class="text-lg font-medium">{{ photo.title || $t('upload_photo.untitled') }}</span>
-            <span class="text-sm text-muted-foreground">{{ photo.caption }}</span>
-          </div>
-          <div class="flex flex-1 flex-wrap gap-6 items-start">
-            <div ref="viewerRef" class="flex flex-wrap gap-4">
-              <UploadPhotoImage type="original" :file="file" />
-              <template v-if="uploadConfig.enableCompression">
-                <UploadPhotoImage v-if="uploadConfig.formats.jpeg" type="JPEG" :file="compressFile?.jpeg" />
-                <UploadPhotoImage v-if="uploadConfig.formats.webp" type="WebP" :file="compressFile?.webp" />
-                <UploadPhotoImage v-if="uploadConfig.formats.avif" type="AVIF" :file="compressFile?.avif" />
-              </template>
-              <UploadPhotoImage v-if="uploadConfig.formats.thumbnail" type="thumbnail" :file="compressFile?.thumbnail" />
-            </div>
-
-            <div class="text-sm text-muted-foreground font-mono flex flex-1 flex-col gap-2 min-w-[200px]">
-              <span>{{ formatCameraText(photo) }}</span>
-              <span>{{ formatExposure(photo).join(' • ') }}</span>
-              <span>{{ photo.focalLength ? toFixed(photo.focalLength, 1) : '--' }}mm <span
-                v-if="photo.focalLengthIn35mmFormat"
-                :title="$t('camera_lens.focal_length_35mm')"
-                class="op-50"
-              >{{ photo.focalLengthIn35mmFormat }}mm</span> • {{ photo.exposureCompensation ? `${photo.exposureCompensation > 0 ? '+' : ''}${photo.exposureCompensation.toFixed(1)}ev` : '0ev' }}</span>
-              <span>{{ formatDate(photo.takenAt) }}</span>
-            </div>
-          </div>
+  <Collapsible
+    v-model:open="isOpen"
+    class="p-4 border border-input rounded-lg flex flex-col gap-4"
+  >
+    <div class="flex gap-2 items-start justify-between">
+      <div class="flex flex-col gap-2 min-w-0">
+        <div class="flex flex-wrap gap-2 items-center">
+          <span class="truncate">{{ file.name }}</span>
+          <Tag
+            v-for="tag in (photo.tags ? photo.tags.split(',') : [])"
+            :key="tag"
+            :label="tag"
+          />
         </div>
-        <div class="flex gap-2 items-end justify-center md:flex-col">
-          <ProButton
-            variant="outline"
-            class="w-fit"
-            :disabled="aiLoading || compressLoading || !loggedIn"
-            :loading="uploadLoading"
-            @click="loggedIn && emit('upload')"
-          >
-            <span>{{ $t('upload_photo.upload_button') }}</span>
-          </ProButton>
-          <ProButton
-            v-if="aiConfig.enabled"
-            variant="outline"
-            class="w-fit"
-            :loading="aiLoading"
-            @click="emit('generate')"
-          >
-            <span>{{ $t('upload_photo.ai_button') }}</span>
-          </ProButton>
+        <div class="flex flex-wrap gap-4 items-center">
+          <span class="text-lg font-medium">{{ photo.title || $t('upload_photo.untitled') }}</span>
+          <span class="text-sm text-muted-foreground">{{ photo.caption }}</span>
         </div>
       </div>
-      <CollapsibleContent>
-        <Card class="p-4">
-          <UploadPhotoForm v-model="photo" />
-        </Card>
-      </CollapsibleContent>
-    </Collapsible>
-    <Button
-      variant="outline"
-      class="p-0 h-6 w-12 translate-x--50% translate-y-50% bottom-0 left-50% absolute bg-card!"
-      @click="isOpen = !isOpen"
-    >
-      <div :class="isOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'" />
-    </Button>
-    <button
-      class="text-muted-foreground rounded-sm bg-accent opacity-70 ring-offset-background transition-opacity right-4 top-4 absolute focus:outline-none hover:opacity-100 disabled:pointer-events-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-      @click="emit('close')"
-    >
-      <div class="i-lucide-x size-4" />
-      <span class="sr-only">Close</span>
-    </button>
-  </Card>
+      <div class="flex shrink-0 gap-1">
+        <TooltipIconButton
+          :icon="isOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+          :label="isOpen ? $t('upload_photo.hide_details') : $t('upload_photo.show_details')"
+          variant="ghost"
+          size="icon"
+          @click="isOpen = !isOpen"
+        />
+        <TooltipIconButton
+          icon="i-lucide-x"
+          :label="$t('button.cancel')"
+          variant="ghost"
+          size="icon"
+          @click="emit('close')"
+        />
+      </div>
+    </div>
+    <div class="flex gap-2 justify-between lt-md:flex-col">
+      <div class="flex flex-1 flex-wrap gap-6 items-start">
+        <div ref="viewerRef" class="flex flex-wrap gap-4">
+          <UploadPhotoImage type="original" :file="file" />
+          <template v-if="uploadConfig.enableCompression">
+            <UploadPhotoImage v-if="uploadConfig.formats.jpeg" type="JPEG" :file="compressFile?.jpeg" />
+            <UploadPhotoImage v-if="uploadConfig.formats.webp" type="WebP" :file="compressFile?.webp" />
+            <UploadPhotoImage v-if="uploadConfig.formats.avif" type="AVIF" :file="compressFile?.avif" />
+          </template>
+          <UploadPhotoImage v-if="uploadConfig.formats.thumbnail" type="thumbnail" :file="compressFile?.thumbnail" />
+        </div>
+
+        <div class="text-sm text-muted-foreground font-mono flex flex-1 flex-col gap-2 min-w-[200px]">
+          <span>{{ formatCameraText(photo) }}</span>
+          <span>{{ formatExposure(photo).join(' · ') }}</span>
+          <span>{{ photo.focalLength ? toFixed(photo.focalLength, 1) : '--' }}mm <span
+            v-if="photo.focalLengthIn35mmFormat"
+            :title="$t('camera_lens.focal_length_35mm')"
+            class="op-50"
+          >{{ photo.focalLengthIn35mmFormat }}mm</span> · {{ photo.exposureCompensation ? `${photo.exposureCompensation > 0 ? '+' : ''}${photo.exposureCompensation.toFixed(1)}ev` : '0ev' }}</span>
+          <span>{{ formatDate(photo.takenAt) }}</span>
+        </div>
+      </div>
+      <div class="flex gap-2 items-end justify-center md:flex-col">
+        <ProButton
+          variant="outline"
+          class="w-fit"
+          :disabled="aiLoading || compressLoading || !loggedIn"
+          :loading="uploadLoading"
+          @click="loggedIn && emit('upload')"
+        >
+          <span>{{ $t('upload_photo.upload_button') }}</span>
+        </ProButton>
+        <ProButton
+          v-if="aiConfig.enabled"
+          variant="outline"
+          class="w-fit"
+          :loading="aiLoading"
+          @click="emit('generate')"
+        >
+          <span>{{ $t('upload_photo.ai_button') }}</span>
+        </ProButton>
+      </div>
+    </div>
+    <CollapsibleContent>
+      <div class="pt-4 border-t">
+        <UploadPhotoForm v-model="photo" />
+      </div>
+    </CollapsibleContent>
+  </Collapsible>
 </template>

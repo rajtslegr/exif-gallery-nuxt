@@ -230,6 +230,22 @@ async function processFiles(rawFiles: File[]) {
 
 const activeId = ref<number>()
 
+const isActive = ref(false)
+
+function onFileChange(e: Event) {
+  const input = e.target as HTMLInputElement
+  if (input.files?.length)
+    processFiles(Array.from(input.files))
+  input.value = ''
+}
+
+function onDrop(e: DragEvent) {
+  isActive.value = false
+  const droppedFiles = e.dataTransfer?.files
+  if (droppedFiles?.length)
+    processFiles(Array.from(droppedFiles))
+}
+
 function closeFile(id: number) {
   const index = files.value.findIndex(f => f.id === id)
   if (index !== -1) {
@@ -239,17 +255,31 @@ function closeFile(id: number) {
 </script>
 
 <template>
-  <div class="mx-auto mb-20 p-4 container flex flex-col gap-4">
+  <div class="mx-auto mb-20 p-4 flex flex-col gap-4 max-w-[1600px]">
     <UploadConfig :disabled="files.length > 0" />
 
-    <FileUpload
-      class="border border-neutral-200 rounded-lg border-dashed dark:border-neutral-800"
-      multiple
-      accept="image/*"
-      @change="processFiles"
+    <label
+      class="px-4 py-16 border border-input rounded-lg border-dashed flex flex-col gap-2 cursor-pointer transition-colors items-center justify-center data-[active=true]:border-primary data-[active=true]:bg-muted hover:bg-muted"
+      :data-active="isActive"
+      @dragover.prevent="isActive = true"
+      @dragleave="isActive = false"
+      @drop.prevent="onDrop"
     >
-      <FileUploadGrid />
-    </FileUpload>
+      <input
+        type="file"
+        multiple
+        accept="image/*"
+        class="hidden"
+        @change="onFileChange"
+      >
+      <div class="i-lucide-upload text-20 text-muted-foreground" />
+      <p class="text-sm">
+        {{ $t('file_upload.title') }}
+      </p>
+      <p class="text-xs text-muted-foreground">
+        {{ $t('file_upload.description') }}
+      </p>
+    </label>
 
     <ProButton
       v-if="files.length"
@@ -277,6 +307,3 @@ function closeFile(id: number) {
     />
   </div>
 </template>
-
-<style scoped>
-</style>

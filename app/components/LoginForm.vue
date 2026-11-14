@@ -28,55 +28,41 @@ async function login() {
 </script>
 
 <template>
-  <Card class="mx-auto lt-sm:w-full sm:min-w-sm">
-    <CardHeader>
-      <CardTitle class="text-2xl">
+  <div class="p-4 flex flex-col gap-4 max-w-sm w-full">
+    <div class="flex flex-col gap-1">
+      <h1 class="text-xl font-medium">
         {{ $t('login_form.title') }}
-      </CardTitle>
-      <CardDescription>
+      </h1>
+      <p class="text-sm text-muted-foreground">
         {{ $t('login_form.description') }}
-      </CardDescription>
-    </CardHeader>
-    <CardContent>
-      <form
-        @submit.prevent="login"
+      </p>
+    </div>
+    <form class="flex flex-col gap-4" @submit.prevent="login">
+      <div class="flex flex-col gap-2">
+        <Label for="password">{{ $t('login_form.password') }}</Label>
+        <Input
+          id="password"
+          v-model="password"
+          type="password"
+          autocomplete="on"
+          required
+          :placeholder="$t('login_form.password_placeholder')"
+        />
+      </div>
+      <ProButton
+        type="submit"
+        class="w-full"
+        :disabled="!password || loading"
+        :loading="loading"
       >
-        <div class="gap-4 grid">
-          <div class="gap-2 grid">
-            <div class="flex items-center">
-              <Label for="password">{{ $t('login_form.password') }}</Label>
-            </div>
-            <div class="w-full items-center relative">
-              <IInput
-                id="password"
-                v-model="password"
-                type="password"
-                autocomplete="on"
-                required
-                :placeholder="$t('login_form.password_placeholder')"
-                class="ps-8 w-full"
-              />
-              <span class="px-2 flex items-center start-0 inset-y-0 justify-center absolute">
-                <div class="i-lucide-lock-keyhole text-muted-foreground" />
-              </span>
-            </div>
-          </div>
-          <InteractiveHoverButton
-            type="submit"
-            :text="$t('login_form.login_button')"
-            class="w-full"
-            :disabled="!password || loading"
-            :loading="loading"
-            left="38%"
-          />
-          <NuxtLinkLocale to="/">
-            <Button variant="ghost" class="group w-full">
-              <div class="i-lucide-chevron-left transition-transform group-hover:translate-x--2" />
-              <span>{{ $t('login_form.back_to_gallery') }}</span>
-            </Button>
-          </NuxtLinkLocale>
-        </div>
-      </form>
-    </CardContent>
-  </Card>
+        {{ $t('login_form.login_button') }}
+      </ProButton>
+      <NuxtLinkLocale to="/">
+        <Button variant="ghost" class="w-full">
+          <div class="i-lucide-chevron-left" />
+          <span>{{ $t('login_form.back_to_gallery') }}</span>
+        </Button>
+      </NuxtLinkLocale>
+    </form>
+  </div>
 </template>
