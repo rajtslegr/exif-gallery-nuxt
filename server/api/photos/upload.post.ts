@@ -1,11 +1,25 @@
 import type { Photo } from '~~/server/utils/drizzle'
 import { blob } from '@nuxthub/blob'
 import { db } from '@nuxthub/db'
+import { eq } from 'drizzle-orm'
 import { purgeGalleryCache } from '../../utils/cache'
+import { hasImageSignature, MAX_FILE_BYTES, MAX_TOTAL_BYTES, parseFormDate, toPhotoFileName } from '../../utils/upload'
 
 interface UploadFile {
   file: File
   type: 'jpeg' | 'webp' | 'avif' | 'thumbnail'
+}
+
+interface UploadResultSuccess {
+  success: true
+  type: 'jpeg' | 'webp' | 'avif' | 'thumbnail'
+  pathname: string
+}
+
+interface UploadResultError {
+  success: false
+  error: unknown
+  fileName: string
 }
 
 export default eventHandler(async (event) => {
@@ -37,26 +51,39 @@ export default eventHandler(async (event) => {
     })
   }
 
+  const oversizedFile = validFiles.find(({ file }) => file.size > MAX_FILE_BYTES)
+  if (oversizedFile) {
+    throw createError({
+      statusCode: 413,
+      message: `File "${oversizedFile.file.name}" exceeds the ${MAX_FILE_BYTES / 1024 / 1024} MB limit`,
+    })
+  }
+
+  const totalBytes = validFiles.reduce((total, { file }) => total + file.size, 0)
+  if (totalBytes > MAX_TOTAL_BYTES) {
+    throw createError({
+      statusCode: 413,
+      message: `Upload exceeds the ${MAX_TOTAL_BYTES / 1024 / 1024} MB limit`,
+    })
+  }
+
+  for (const { file } of validFiles) {
+    if (!(await hasImageSignature(file))) {
+      throw createError({
+        statusCode: 415,
+        message: `File "${file.name}" is not a supported image`,
+      })
+    }
+  }
+
   // Generate a unique ID for this upload group
   const uploadId = createCuid()
+  const fileName = toPhotoFileName(validFiles[0]!.file)
 
-  interface UploadResultSuccess {
-    success: true
-    type: 'jpeg' | 'webp' | 'avif' | 'thumbnail'
-    pathname: string
-  }
-  interface UploadResultError {
-    success: false
-    error: unknown
-    fileName: string
-  }
-
-  let fileName = createCuid()
   const uploadResults = await Promise.allSettled<UploadResultSuccess | UploadResultError>(
     validFiles.map(async (file) => {
       try {
         const filename = file.file.name
-        fileName = filename.substring(0, filename.lastIndexOf('.'))
         const extension = filename.substring(filename.lastIndexOf('.'))
         const pathname = `Image-${uploadId}-${file.type}${extension}`
 
@@ -90,7 +117,7 @@ export default eventHandler(async (event) => {
     // Add metadata fields from form data
     const photoEntry: Partial<Photo> = {
       // File info
-      fileModified: formData.get('fileModified') ? new Date(formData.get('fileModified')!.toString()) : new Date(),
+      fileModified: parseFormDate(formData.get('fileModified')) ?? new Date(),
       // Photos
       ...fileEntry,
       // Description
@@ -111,13 +138,14 @@ export default eventHandler(async (event) => {
       locationName: formData.get('locationName')?.toString() || null,
       latitude: Number(formData.get('latitude')) || null,
       longitude: Number(formData.get('longitude')) || null,
-      takenAt: formData.get('takenAt') ? new Date(formData.get('takenAt')!.toString()) : null,
+      takenAt: parseFormDate(formData.get('takenAt')),
       // Photo info
       aspectRatio: Number(formData.get('aspectRatio')) || 1.5,
       // Photo config
       priorityOrder: Number(formData.get('priorityOrder')) || null,
     }
 
+    let insertedPhotoId: string | undefined
     try {
       const newPhoto = await db.insert(schema.photo)
         .values({
@@ -130,12 +158,21 @@ export default eventHandler(async (event) => {
         throw new Error('Failed to insert photo')
       }
 
-      const photoId = newPhoto[0]!.id
-      await processPhotoTags(photoId, tags)
+      insertedPhotoId = newPhoto[0]!.id
+      await processPhotoTags(insertedPhotoId, tags)
       await purgeGalleryCache(event)
     }
     catch (error) {
       console.error('Failed to insert photo into database:', error)
+      // The client sees a failure, so it must not leave files behind: remove the
+      // row (photo_tags cascade) and the blobs that were already written.
+      if (insertedPhotoId) {
+        await db.delete(schema.photo)
+          .where(eq(schema.photo.id, insertedPhotoId))
+          .catch(rollbackError => console.error('Failed to roll back photo row:', rollbackError))
+      }
+      await Promise.allSettled(successfulUploads.map(({ pathname }) => blob.delete(pathname)))
+
       throw createError({
         statusCode: 500,
         message: 'Failed to save photo information',
@@ -148,7 +185,7 @@ export default eventHandler(async (event) => {
       .filter((result): result is PromiseRejectedResult => result.status === 'rejected')
       .map(result => ({ fileName: 'Unknown', error: result.reason })),
     ...uploadResults
-      .filter((result): result is PromiseFulfilledResult<{ success: false, fileName: string, error: unknown }> =>
+      .filter((result): result is PromiseFulfilledResult<UploadResultError> =>
         result.status === 'fulfilled' && !result.value.success)
       .map(result => ({ fileName: result.value.fileName, error: result.value.error })),
   ]

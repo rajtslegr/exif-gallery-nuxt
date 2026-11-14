@@ -1,13 +1,14 @@
+import type { PublicPhoto } from '../../utils/photos'
 import { db } from '@nuxthub/db'
 import { and, asc, desc, eq, inArray, like, or, sql } from 'drizzle-orm'
 import { useValidatedQuery, z } from 'h3-zod'
 import { setGalleryPhotosCacheHeaders } from '../../utils/cache'
-import { loadPhotoTags } from '../../utils/photos'
+import { loadPhotoTags, toPublicPhoto } from '../../utils/photos'
 
 const photoQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
   offset: z.coerce.number().int().min(0).default(0),
-  orderBy: z.enum(['takenAt', 'createdAt']).default('takenAt'),
+  orderBy: z.enum(['takenAt', 'createdAt', 'priorityOrder']).default('takenAt'),
   order: z.enum(['asc', 'desc']).default('desc'),
   tag: z.union([z.string(), z.array(z.string())]).optional(),
   camera: z.string().max(200).optional(),
@@ -18,14 +19,29 @@ const photoQuerySchema = z.object({
 type SerializedPhoto = typeof schema.photo.$inferSelect
 
 interface PhotosResponse {
-  data: (SerializedPhoto & { tags: string[] })[]
+  data: (PublicPhoto & { tags: string[] })[]
   hasMore: boolean
   limit: number
   offset: number
 }
 
+function toResponsePhoto(
+  photo: SerializedPhoto,
+  tagsByPhotoId: Map<string, string[]>,
+  includePrivateFields: boolean,
+): PublicPhoto & { tags: string[] } {
+  const tags = tagsByPhotoId.get(photo.id) ?? []
+  return includePrivateFields ? { ...photo, tags } : { ...toPublicPhoto(photo), tags }
+}
+
 export default eventHandler(async (event): Promise<PhotosResponse> => {
-  setGalleryPhotosCacheHeaders(event)
+  // Admins need the full row (the edit dialog prefills GPS); anonymous visitors
+  // get the public projection. Only the public response may be shared-cached.
+  // Every authenticated session is an admin session, so a session is enough.
+  const { user } = await getUserSession(event)
+  const includePrivateFields = !!user
+  if (!includePrivateFields)
+    setGalleryPhotosCacheHeaders(event)
 
   const {
     limit: limitNum,
@@ -39,8 +55,6 @@ export default eventHandler(async (event): Promise<PhotosResponse> => {
   } = await useValidatedQuery(event, photoQuerySchema)
 
   const conditions = []
-
-  // The hidden column is kept for legacy rows, but the public gallery does not use it yet.
 
   // Camera filter: "make|model" or just "make"
   if (camera) {
@@ -94,10 +108,17 @@ export default eventHandler(async (event): Promise<PhotosResponse> => {
   const orderColumn = orderBy === 'createdAt'
     ? schema.photo.createdAt
     : schema.photo.takenAt
-  const orderExpression = order === 'asc' ? asc(orderColumn) : desc(orderColumn)
   // Photos imported in bursts share a timestamp; the id tiebreaker keeps offset
   // pagination deterministic instead of duplicating or skipping rows.
-  const orderExpressions = [orderExpression, desc(schema.photo.id)]
+  const orderExpressions = orderBy === 'priorityOrder'
+    ? [
+        // Featured photos first, then the usual newest-first order for the rest
+        asc(sql`${schema.photo.priorityOrder} is null`),
+        order === 'asc' ? asc(schema.photo.priorityOrder) : desc(schema.photo.priorityOrder),
+        desc(schema.photo.takenAt),
+        desc(schema.photo.id),
+      ]
+    : [order === 'asc' ? asc(orderColumn) : desc(orderColumn), desc(schema.photo.id)]
   const photoConditions = conditions.length > 0 ? and(...conditions) : undefined
   const queryLimit = limitNum + 1
 
@@ -133,7 +154,7 @@ export default eventHandler(async (event): Promise<PhotosResponse> => {
     const tagsByPhotoId = await loadPhotoTags(photos.map(photo => photo.id))
 
     return {
-      data: photos.map(photo => ({ ...photo, tags: tagsByPhotoId.get(photo.id) ?? [] })),
+      data: photos.map(photo => toResponsePhoto(photo, tagsByPhotoId, includePrivateFields)),
       hasMore,
       limit: limitNum,
       offset: offsetNum,
@@ -151,7 +172,7 @@ export default eventHandler(async (event): Promise<PhotosResponse> => {
   const tagsByPhotoId = await loadPhotoTags(pagePhotos.map(photo => photo.id))
 
   return {
-    data: pagePhotos.map(photo => ({ ...photo, tags: tagsByPhotoId.get(photo.id) ?? [] })),
+    data: pagePhotos.map(photo => toResponsePhoto(photo, tagsByPhotoId, includePrivateFields)),
     hasMore,
     limit: limitNum,
     offset: offsetNum,

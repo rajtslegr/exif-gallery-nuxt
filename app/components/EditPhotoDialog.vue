@@ -27,6 +27,48 @@ const editedPhotoForm = computed<IPhotoForm>({
 })
 const isSaving = ref(false)
 
+const EDITABLE_FIELDS = [
+  'title',
+  'caption',
+  'semanticDescription',
+  'make',
+  'model',
+  'focalLength',
+  'focalLengthIn35mmFormat',
+  'lensMake',
+  'lensModel',
+  'fNumber',
+  'iso',
+  'exposureTime',
+  'exposureCompensation',
+  'locationName',
+  'latitude',
+  'longitude',
+  'priorityOrder',
+  'takenAt',
+] as const
+
+/**
+ * Send only fields the dialog actually received. The list endpoint omits
+ * coordinates for anonymous visitors, and a missing key must leave the stored
+ * value alone instead of clearing it.
+ */
+function buildPayload(photo: IPhoto) {
+  const body: Record<string, unknown> = { tags: photo.tags.join(',') }
+
+  for (const field of EDITABLE_FIELDS) {
+    const value = photo[field]
+    if (value === undefined)
+      continue
+
+    body[field] = field === 'takenAt'
+      ? new Date(value as Date | string).toISOString()
+      : value === '' ? null : value
+  }
+
+  return body
+}
+
 watch(() => photo, (val) => {
   if (val) {
     editedPhoto.value = { ...val }
@@ -47,13 +89,7 @@ async function saveChanges() {
     isSaving.value = true
     await $fetch(`/api/photos/${editedPhoto.value.id}`, {
       method: 'PUT',
-      body: {
-        id: editedPhoto.value.id,
-        tags: editedPhoto.value.tags.join(','),
-        ...Object.fromEntries(
-          Object.entries(editedPhoto.value).filter(([key, value]) => key !== 'tags' && !!value),
-        ),
-      },
+      body: buildPayload(editedPhoto.value),
     })
 
     pStore.updatePhoto(editedPhoto.value)

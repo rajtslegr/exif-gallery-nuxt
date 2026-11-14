@@ -3,12 +3,16 @@ type ConvertNullToUndefined<T> = {
 }
 
 // Union type to accept both Date and string for API responses
-export type APIDataPhoto = Omit<Photo, 'fileModified' | 'takenAt' | 'createdAt' | 'updatedAt'>
+export type APIDataPhoto = Omit<Photo, 'fileModified' | 'takenAt' | 'createdAt' | 'updatedAt' | 'latitude' | 'longitude'>
   & {
     fileModified: Date | string | null
     takenAt: Date | string | null
     createdAt: Date | string | null
     updatedAt: Date | string | null
+    // Coordinates are only returned to an authenticated admin, so anonymous
+    // responses omit them entirely.
+    latitude?: number | null
+    longitude?: number | null
     // Tags come from the photo_tags relation, not from a photos column
     tags: string[]
   }

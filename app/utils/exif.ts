@@ -27,9 +27,10 @@ export async function getExifData(file: File) {
     iso: exifData?.ISO,
     exposureTime: exifData?.ExposureTime,
     exposureCompensation: exifData?.ExposureCompensation,
-    locationName: exifData?.Location,
-    latitude: exifData?.Latitude,
-    longitude: exifData?.Longitude,
+    // exifr exposes the computed decimal degrees, not `Latitude`/`Longitude`.
+    // Coordinates stay server-side; see `toPublicPhoto`.
+    latitude: exifData?.latitude,
+    longitude: exifData?.longitude,
     takenAt: exifData?.DateTimeOriginal,
   }
 

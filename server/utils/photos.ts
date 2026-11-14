@@ -1,5 +1,18 @@
+import type { Photo } from './drizzle'
 import { db } from '@nuxthub/db'
 import { eq, inArray } from 'drizzle-orm'
+
+/**
+ * A photo as it may leave the server for anonymous visitors.
+ * Exact coordinates are stored for future map/geocoding work, but they identify
+ * where a photo was taken (often someone's home), so they are never public.
+ */
+export type PublicPhoto = Omit<Photo, 'latitude' | 'longitude'> & Partial<Pick<Photo, 'latitude' | 'longitude'>>
+
+export function toPublicPhoto(photo: Photo): PublicPhoto {
+  const { latitude: _latitude, longitude: _longitude, ...rest } = photo
+  return rest
+}
 
 /**
  * Loads tag names for the given photos in one query and groups them by photo id,

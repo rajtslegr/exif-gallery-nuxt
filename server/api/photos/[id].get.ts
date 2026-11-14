@@ -1,6 +1,6 @@
 import { db } from '@nuxthub/db'
 import { eq } from 'drizzle-orm'
-import { loadPhotoTags } from '../../utils/photos'
+import { loadPhotoTags, toPublicPhoto } from '../../utils/photos'
 
 export default eventHandler(async (event) => {
   const { id } = event.context.params || {}
@@ -24,6 +24,13 @@ export default eventHandler(async (event) => {
   }
 
   const tagsByPhotoId = await loadPhotoTags([photo.id])
+  const tags = tagsByPhotoId.get(photo.id) ?? []
 
-  return { ...photo, tags: tagsByPhotoId.get(photo.id) ?? [] }
+  // Coordinates are admin-only: the detail page is public and this response is
+  // also serialized into the page payload.
+  const { user } = await getUserSession(event)
+  if (user)
+    return { ...photo, tags }
+
+  return { ...toPublicPhoto(photo), tags }
 })
