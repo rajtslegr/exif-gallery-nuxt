@@ -13,6 +13,8 @@
     "ui": "pnpx shadcn-vue",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "logs": "wrangler tail"
   },
   "dependencies": {
@@ -78,6 +80,7 @@
     "unocss": "^66.12.0",
     "unocss-preset-animations": "^1.3.0",
     "unocss-preset-shadcn": "^1.0.1",
+    "vitest": "^5.1.0",
     "vue-tsc": "^3.3.14",
     "wrangler": "^4.158.0"
   },

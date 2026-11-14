@@ -1,18 +1,8 @@
 import { db, schema } from '@nuxthub/db'
 import { and, eq, inArray, sql } from 'drizzle-orm'
-
-const MAX_TAG_NAME_LENGTH = 64
+import { parseTagNames } from './tag-names'
 
 type BatchStatement = Parameters<typeof db.batch>[0][number]
-
-function parseTagNames(tags: string) {
-  const names = tags
-    .split(',')
-    .map(name => name.trim().slice(0, MAX_TAG_NAME_LENGTH))
-    .filter(Boolean)
-
-  return [...new Set(names)]
-}
 
 export function recountTagsStatement(tagIds: string[]) {
   // Recompute instead of incrementing/decrementing so the counter self-heals
