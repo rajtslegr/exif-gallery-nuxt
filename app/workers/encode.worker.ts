@@ -63,13 +63,15 @@ globalThis.onmessage = async (e) => {
       })
     }
     else if (options.target === 'thumbnail') {
+      // 480px on the short edge: grid tiles are up to ~400 CSS px, so the old
+      // 240/320 was visibly soft on retina screens
       let thumbnailWidth = options.resizeOptions?.width
       let thumbnailHeight = options.resizeOptions?.height
       if (!thumbnailHeight && !thumbnailWidth) {
         if (imageData.width > imageData.height)
-          thumbnailHeight = 240
+          thumbnailHeight = 480
         else
-          thumbnailWidth = 320
+          thumbnailWidth = 480
       }
       if (!thumbnailWidth && thumbnailHeight) {
         const imageRatio = imageData.width / imageData.height

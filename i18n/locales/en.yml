@@ -39,6 +39,9 @@ header:
 sort:
   taken_at: Taken Time
   created_at: Created Time
+  priority: Featured
+  priority_value: Priority
+  priority_hint: Higher numbers appear first when sorting by Featured
   direction: Sort Direction
   field: Sort Field
   desc: Descending
@@ -161,3 +164,11 @@ search:
   hint: Multi-keyword search supported, separate with spaces (e.g. Canon sunset)
   no_results: No photos found
   try_other_keywords: Try other keywords
+filter:
+  tag_title: 'Photos tagged "{name}"'
+  camera_title: 'Photos shot with {name}'
+  lens_title: 'Photos shot with {name}'
+error:
+  not_found: This page does not exist
+  server: Something went wrong on our side
+  back_home: Back to the gallery

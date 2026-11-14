@@ -117,5 +117,21 @@ const photo = defineModel<IPhotoForm>({ required: true })
         </div>
       </div>
     </div>
+
+    <!-- Gallery ordering -->
+    <div>
+      <h3 class="text-lg font-medium">
+        {{ $t('sort.priority') }}
+      </h3>
+      <div class="gap-x-4 gap-y-1 grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2">
+        <div>
+          <Label class="text-sm font-medium">{{ $t('sort.priority_value') }}</Label>
+          <NumberFieldFull v-model="photo.priorityOrder" />
+          <p class="text-xs text-muted-foreground">
+            {{ $t('sort.priority_hint') }}
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>

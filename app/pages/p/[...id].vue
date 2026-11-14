@@ -12,6 +12,7 @@ const route = useRoute()
 const imageReady = ref(false)
 const router = useRouter()
 const localePath = useLocalePath()
+const config = useRuntimeConfig()
 
 const id = ref(route.params.id?.[0] || '')
 
@@ -65,6 +66,28 @@ useSeoMeta({
 
 useHead(() => ({
   link: photoUrl.value ? [{ rel: 'canonical', href: photoUrl.value }] : [],
+  script: photo.value
+    ? [{
+        type: 'application/ld+json',
+        // Structured data for image search. A caption containing a closing script
+        // tag must not end this block, so every `<` is escaped.
+        innerHTML: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'ImageObject',
+          'name': photoTitle.value,
+          'description': photoDescription.value,
+          'contentUrl': photoImageUrl.value,
+          'thumbnailUrl': photo.value.thumbnail ? `${origin}/photos/${photo.value.thumbnail}` : undefined,
+          'url': photoUrl.value,
+          'datePublished': (photo.value.takenAt ?? photo.value.createdAt)?.toISOString(),
+          'uploadDate': photo.value.createdAt?.toISOString(),
+          'keywords': photo.value.tags.length ? photo.value.tags.join(', ') : undefined,
+          'copyrightHolder': config.public.title
+            ? { '@type': 'Organization', 'name': config.public.title }
+            : undefined,
+        }).replace(/</g, '\\u003c'),
+      }]
+    : [],
 }))
 
 const pStore = usePhotosStore()

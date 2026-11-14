@@ -37,7 +37,7 @@ const { orderBy, order, setSort } = usePhotoSort()
       <DropdownMenuSeparator />
 
       <!-- Sort field group -->
-      <DropdownMenuRadioGroup v-model="orderBy" @update:model-value="v => setSort(v as 'takenAt' | 'createdAt')">
+      <DropdownMenuRadioGroup v-model="orderBy" @update:model-value="v => setSort(v as 'takenAt' | 'createdAt' | 'priorityOrder')">
         <DropdownMenuLabel class="text-xs text-muted-foreground">
           {{ $t('sort.field') }}
         </DropdownMenuLabel>
@@ -51,6 +51,12 @@ const { orderBy, order, setSort } = usePhotoSort()
           <div class="flex gap-1 w-full items-center justify-between">
             <span>{{ $t('sort.created_at') }}</span>
             <div class="i-lucide-cloud-upload op-50" />
+          </div>
+        </DropdownMenuRadioItem>
+        <DropdownMenuRadioItem value="priorityOrder" class="flex gap-2">
+          <div class="flex gap-1 w-full items-center justify-between">
+            <span>{{ $t('sort.priority') }}</span>
+            <div class="i-lucide-star op-50" />
           </div>
         </DropdownMenuRadioItem>
       </DropdownMenuRadioGroup>

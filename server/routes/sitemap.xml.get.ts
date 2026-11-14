@@ -1,40 +1,13 @@
 import { db } from '@nuxthub/db'
 import { and, desc, gt, isNotNull, sql } from 'drizzle-orm'
 import { setGalleryPhotosCacheHeaders } from '../utils/cache'
-import { getSiteUrl } from '../utils/site'
+import { escapeXml, getSiteUrl, toLastmod } from '../utils/site'
 
 const PAGE_SIZE = 500
 
 interface SitemapEntry {
   path: string
   lastmod?: string
-}
-
-function escapeXml(value: string) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;')
-}
-
-// Stored timestamps are second based integers in new rows, but the CURRENT_TIMESTAMP
-// default writes text, so accept both and treat naive sqlite timestamps as UTC.
-function toLastmod(value: unknown) {
-  if (value instanceof Date)
-    return Number.isNaN(value.getTime()) ? undefined : value.toISOString()
-
-  if (typeof value === 'number')
-    return new Date(value * 1000).toISOString()
-
-  if (typeof value === 'string' && value) {
-    const naiveTimestamp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)
-    const parsed = new Date(naiveTimestamp ? `${value.replace(' ', 'T')}Z` : value)
-    return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString()
-  }
-
-  return undefined
 }
 
 async function collectEntries() {

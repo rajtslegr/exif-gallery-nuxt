@@ -16,6 +16,8 @@ const config = useRuntimeConfig()
 const { t } = useI18n()
 const title = config.public.title || t('title')
 const description = config.public.description || t('description')
+// Same origin as the request, so a fork does not advertise the original domain
+const origin = useRequestURL().origin
 
 useHead({
   title,
@@ -26,6 +28,7 @@ useHead({
   ],
   link: [
     { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+    { rel: 'alternate', type: 'application/rss+xml', title, href: '/feed.xml' },
   ],
   htmlAttrs: {
     lang: 'en',
@@ -41,7 +44,7 @@ useSeoMeta({
   description,
   ogDescription: description,
   ogSiteName: title,
-  ogImage: 'https://photo.wiidede.space/exif-gallery-nuxt.jpg',
+  ogImage: `${origin}/exif-gallery-nuxt.jpg`,
   twitterCard: 'summary_large_image',
 })
 </script>

@@ -1,10 +1,16 @@
-export type OrderByType = 'takenAt' | 'createdAt'
+export type OrderByType = 'takenAt' | 'createdAt' | 'priorityOrder'
 export type OrderType = 'desc' | 'asc'
 
 export interface SortOption {
   label: string
   orderBy: OrderByType
   order: OrderType
+}
+
+const SORT_LABELS: Record<OrderByType, string> = {
+  takenAt: 'sort.taken_at',
+  createdAt: 'sort.created_at',
+  priorityOrder: 'sort.priority',
 }
 
 export function usePhotoSort() {
@@ -33,9 +39,7 @@ export function usePhotoSort() {
   }
 
   function getSortLabel(orderByValue: OrderByType): string {
-    return orderByValue === 'takenAt'
-      ? t('sort.taken_at')
-      : t('sort.created_at')
+    return t(SORT_LABELS[orderByValue])
   }
 
   return {
