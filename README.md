@@ -1,246 +1,105 @@
-<div align="center">
-
 # EXIF Gallery Nuxt
 
-**A free personal photo gallery deployable on Cloudflare, with AI image analysis and browser-side image compression**
+Self-hosted photo gallery for Cloudflare. Photos are uploaded from the browser,
+compressed into JPEG/WebP/AVIF + thumbnail variants, described by an AI provider,
+and served from Cloudflare R2 with metadata in D1.
 
-[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
-[![Nuxt](https://img.shields.io/badge/Nuxt-4.0-00DC82?style=for-the-badge&logo=nuxt.js&logoColor=white)](https://nuxt.com/)
-[![Vue](https://img.shields.io/badge/Vue-3.5-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)](https://vuejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+## Features
 
-</div>
+- Browser-side compression and resize via Web Workers ([JSQuash](https://github.com/jamsinclair/jSquash)), so the server never touches pixels
+- Full EXIF extraction (`exifr`) and per-photo metadata editing
+- Optional AI-generated title, caption, tags and semantic description (OpenAI, Gemini, or any OpenAI-compatible endpoint)
+- Normalized tag system, plus camera/lens filtering and full-text search
+- Gallery and grid views, infinite scroll, `viewer.js` lightbox
+- RSS feed, sitemap, robots.txt, Open Graph image
+- Password-protected admin panel for upload, edit and delete
+- Edge-native: Nuxt on Cloudflare Workers, D1 for data, R2 for blobs
 
----
+## Stack
 
-![exif-gallery-nuxt](./public/exif-gallery-nuxt.jpg)
+Nuxt 4 · Vue 3.5 · Cloudflare Workers (D1 + R2 via NuxtHub) · Drizzle ORM · UnoCSS · shadcn-vue / reka-ui · Pinia · `@nuxtjs/i18n` (English only) · `nuxt-auth-utils` · AI SDK · Vitest
 
-## ✨ Features
-
-- 🆓 **Free Cloudflare Deployment** - Zero-cost hosting on Cloudflare Workers with generous free tier
-- 🧠 **AI-Powered Image Intelligence** - Integration with OpenAI and Gemini for semantic analysis and intelligent image descriptions
-- 🖼️ **Smart Image Processing** - Browser-side compression supporting JPEG, WebP, and AVIF formats with automatic thumbnail generation
-- 💾 **Edge-Native Storage** - Cloudflare R2 object storage with D1 database for optimal performance and global edge deployment
-- 📊 **Complete EXIF Management** - Full extraction and display of image metadata including camera settings, location data, and timestamps
-- 🏷️ **Flexible Tagging System** - Organize photos with custom tags and filter by categories
-- 📑 **Sorting & Pagination** - Sort photos and smooth pagination
-- 🎨 **Modern User Experience** - Responsive design with smooth view transitions and beautiful UI components
-- 🔐 **Secure Admin Panel** - Built-in authentication system for secure photo management and uploads
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) 18.x or higher
-- [pnpm](https://pnpm.io/) (recommended)
+## Local development
 
 ```bash
-# Install pnpm (if not already installed)
-corepack enable pnpm
-
-# Clone the repository
-git clone https://github.com/wiidede/exif-gallery-nuxt.git
-cd exif-gallery-nuxt
-
-# Install dependencies
 pnpm install
-
-# Start development server
-pnpm dev
+pnpm dev          # local D1 + R2 emulation
+pnpm dev --remote # run against the real Cloudflare resources
 ```
 
-Visit `http://localhost:3000` to see the application.
-
-## 🛠️ Tech Stack
-
-- **Framework**: [Nuxt 4](https://nuxt.com/) - The Intuitive Vue Framework
-- **Edge Platform**: [NuxtHub](https://hub.nuxt.com) - Build fullstack applications on the edge
-- **Database**: [D1](https://developers.cloudflare.com/d1/) - SQLite at the edge
-- **Storage**: [R2](https://developers.cloudflare.com/r2/) - S3-compatible object storage
-- **Styling**: [UnoCSS](https://unocss.dev/) - The instant on-demand atomic CSS engine
-- **UI Components**: [shadcn-vue](https://www.shadcn-vue.com/) + [inspira-ui](https://inspira-ui.com/)
-- **State Management**: [Pinia](https://pinia.vuejs.org/)
-- **Validation**: [vee-validate](https://vee-validate.logaretm.com/) + [Zod](https://zod.dev/)
-- **AI**: [OpenAI](https://openai.com/) + [Google Gemini](https://gemini.google.com/)
-- **Code Quality**: [TypeScript](https://www.typescriptlang.org/) + [ESLint](https://eslint.org/)
-
-## 📦 Deployment
-
-### Deploy to Cloudflare Workers
-
-This project is designed for deployment on Cloudflare Workers with NuxtHub.
-
-#### Step 1: Create Cloudflare Resources
-
-1. **Create D1 Database**
-   - Navigate to **Storage & Databases** → **D1 SQL Database** in Cloudflare Dashboard
-   - Create a database named `exif-gallery-nuxt` and note the **Database ID**
-
-2. **Create R2 Bucket**
-   - Navigate to **Storage & Databases** → **R2 Object Storage**
-   - Create a bucket and note the **bucket name**
-
-#### Step 2: Configure Deployment
-
-Update `wrangler.jsonc` with your Cloudflare resource IDs:
-
-```jsonc
-{
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "exif-gallery-nuxt",
-      "database_id": "YOUR_DATABASE_ID",
-      "migrations_dir": "server/db/migrations/sqlite",
-      "migrations_table": "_hub_migrations"
-    }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "BLOB",
-      "bucket_name": "YOUR_BUCKET_NAME"
-    }
-  ]
-}
-```
-
-#### Step 2.5: Initialize Database
-
-**Important**: Cloudflare D1 database cannot be connected during build, so migrations are **not automatically applied**. You must manually run migrations to create the table structure.
-
-**Using GitHub Actions (Recommended, Automated)**
-
-The project includes a `.github/workflows/migrate.yml` file. You can:
-
-1. Add the following secrets in your GitHub repository settings:
-   - `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare account ID (visible in Cloudflare Dashboard)
-   - `CLOUDFLARE_API_TOKEN` - API token with D1 edit permissions (create at Cloudflare Dashboard → My Profile → API Tokens)
-
-2. Push code to the `main` branch, or manually trigger the `Database Migration` workflow in GitHub Actions
-
-> [!NOTE]
-> This project adopts a separated migration management strategy:
->
-> - Local Development: Migrations are automatically managed by NuxtHub and recorded in the `_hub_migrations` table.
-> - Cloud Deployment: Migrations are managed via GitHub Actions using Wrangler, also recorded in the `_hub_migrations` table, but with an additional `.sql` file extension compared to NuxtHub migrations.
-> - Note: Do not manually run Wrangler migration commands during local development, as those files lack the `.sql` suffix.
-
-#### Step 3: Deploy via Cloudflare Dashboard
-
-1. Go to **Workers & Pages** → **Create application** → **Connect to Git**
-2. Select your forked repository
-3. Configure build settings:
-   - **Build command**: `pnpm run build`
-   - **Deploy command**: `npx wrangler deploy`
-4. Add environment variables:
-   - `NUXT_SESSION_PASSWORD` - Generate a secure random string (at least 32 characters)
-   - `NUXT_ADMIN_PASSWORD` - Set your admin panel password
-5. Click **Deploy**
-
-NuxtHub will automatically configure D1 and R2 bindings based on `wrangler.jsonc`.
-
-### Manual Deployment
+Other scripts:
 
 ```bash
-# Build for production
-pnpm run build
-
-# Deploy to Cloudflare Workers
-npx wrangler deploy
+pnpm build        # production build
+pnpm preview      # preview the production build
+pnpm deploy       # build and deploy to Cloudflare Workers
+pnpm db:generate  # generate a Drizzle migration after editing server/db/schema.ts
+pnpm lint --fix   # ESLint (@antfu/eslint-config)
+pnpm typecheck    # vue-tsc
+pnpm test         # Vitest unit tests (server/utils)
+pnpm logs         # wrangler tail of the deployment
 ```
 
-### Remote Development
+## Environment variables
 
-Connect to your remote Cloudflare resources locally:
+Set these in `.env` for local development and in the Workers runtime for production:
 
-```bash
-pnpm dev --remote
+| Variable                   | Required | Purpose                                                        |
+| -------------------------- | -------- | -------------------------------------------------------------- |
+| `NUXT_ADMIN_PASSWORD`      | yes      | Admin panel password. Auth returns 500 if unset.               |
+| `NUXT_SESSION_PASSWORD`    | yes      | `nuxt-auth-utils` session key, at least 32 characters.         |
+| `NUXT_PUBLIC_TITLE`        | no       | Site title, falls back to the `title` i18n string.             |
+| `NUXT_PUBLIC_DESCRIPTION`  | no       | Meta description, falls back to the `description` i18n string. |
+| `NUXT_PUBLIC_DEFAULT_VIEW` | no       | Home view: `gallery` (default) or `grid`.                      |
+
+AI provider settings are configured in the admin panel and stored in `localStorage`, not in env vars.
+
+## Deployment
+
+`wrangler.jsonc` binds the two Cloudflare resources: the `DB` D1 database and the
+`BLOB` R2 bucket. Deploy with `pnpm deploy`, then apply migrations through the
+`Database Migration` GitHub Action (`.github/workflows/migrate.yml`), which needs
+the `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` secrets.
+
+### Migration tracking
+
+The two environments record applied migrations differently:
+
+- **Local dev** — NuxtHub manages migrations and writes names without the `.sql` suffix into `_hub_migrations`.
+- **Production** — `wrangler d1 migrations apply` writes names with the `.sql` suffix.
+
+Never run `wrangler d1 migrations` commands against your local database; the suffix
+mismatch makes the same migration run twice. Local changes are applied by NuxtHub
+automatically, production changes by the GitHub Action on every push to `main`.
+
+## Project structure
+
+```text
+app/
+  components/    ui (shadcn-vue), inspira, ui-pro, feature components
+  composables/   photos, AI config, upload config, sorting, theme
+  pages/         index, gallery, grid, p/[...id], tag/, camera/, lens/, admin/
+  stores/        Pinia caches (photos, navigation)
+  workers/       decode.worker.ts, encode.worker.ts
+  utils/         compress.ts, AI providers
+i18n/locales/    en.yml
+server/
+  api/           auth, photos (CRUD + upload), tags
+  routes/        /photos/[pathname], feed.xml, sitemap.xml, robots.txt
+  db/            schema.ts, migrations, scripts
+  utils/         query helpers, cache, feed, tag normalization (+ Vitest specs)
 ```
 
-### Migration from NuxtHub Admin
+## Data model
 
-For users who previously deployed using NuxtHub Admin:
-
-1. **Update your fork** to get the latest changes:
-
-2. **Get existing resources** from your NuxtHub project:
-   - D1 database ID
-   - R2 bucket name
-
-3. **Update `wrangler.jsonc`** with your existing resources:
-
-   ```jsonc
-   {
-     "d1_databases": [{ "binding": "DB", "database_id": "YOUR_EXISTING_DATABASE_ID" }],
-     "r2_buckets": [{ "binding": "BLOB", "bucket_name": "YOUR_EXISTING_BUCKET_NAME" }]
-   }
-   ```
-
-   Commit and push this change.
-
-4. **Create new Worker** by following steps 2-3 in the deployment section above
-
-5. **Configure environment variables** from your old project
-
-6. **Deploy** - your data remains in the same D1 database and R2 bucket
-
-## 🔧 Configuration
-
-### Environment Variables
-
-| Variable                   | Required | Default                                                                                                                       | Description                                                        |
-| -------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `NUXT_ADMIN_PASSWORD`      | Yes      | `admin`                                                                                                                       | Admin panel access password                                        |
-| `NUXT_SESSION_PASSWORD`    | Yes      | --                                                                                                                            | Session encryption key(at least 32 characters)                     |
-| `NUXT_PUBLIC_TITLE`        | No       | `Exif Gallery Nuxt`                                                                                                           | Application title                                                  |
-| `NUXT_PUBLIC_DESCRIPTION`  | No       | `A full-stack photo album solution that integrates AI intelligent processing, browser image compression, and other functions` | Application description                                            |
-| `NUXT_PUBLIC_DEFAULT_VIEW` | No       | `gallery`                                                                                                                     | Default view of the home page: `gallery` (vertical feed) or `grid` |
-
-## 📁 Project Structure
-
-```
-exif-gallery-nuxt/
-├── app/                    # Frontend application
-│   ├── components/         # Vue components
-│   ├── composables/       # Vue composables
-│   ├── pages/             # Application pages
-│   ├── stores/            # Pinia stores
-│   ├── utils/             # Utility functions
-│   └── workers/           # Web Workers
-├── server/                # Backend API
-│   ├── api/               # API routes
-│   ├── db/                # Database schema
-│   └── utils/             # Server utilities
-└── types/                 # TypeScript definitions
+```text
+photos (1) ←→ (N) photo_tags (N) ←→ (1) tags
 ```
 
-## 🤝 Contributing
+`photos` holds EXIF, file names for each R2 variant, AI metadata and ordering;
+`tags.name` is unique with a denormalized `photo_count`; `photo_tags` cascades on
+both sides.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## License
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [exif-photo-blog](https://github.com/sambecker/exif-photo-blog) - Inspiration for EXIF handling
-- [nuxt-image-gallery](https://github.com/Flosciante/nuxt-image-gallery) - Gallery implementation reference
-- [NuxtHub](https://hub.nuxt.com) - Edge deployment platform
-- [shadcn-vue](https://www.shadcn-vue.com/) - Beautiful UI components
-- [inspira-ui](https://inspira-ui.com/) - Animated UI components
-
----
-
-<div align="center">
-
-Made with ❤️ by [wiidede](https://github.com/wiidede)
-
-</div>
+MIT, see [LICENSE](./LICENSE).

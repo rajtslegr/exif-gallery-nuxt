@@ -23,15 +23,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Fix migration names (NuxtHub Admin compatibility)
-        run: |
-          pnpx wrangler d1 execute exif-gallery-nuxt --remote \
-            --command="UPDATE _hub_migrations SET name = name || '.sql' WHERE name NOT LIKE '%.sql';" \
-            2>/dev/null || true
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-
       - name: Run D1 migrations
         run: pnpx wrangler d1 migrations apply exif-gallery-nuxt --remote
         env:
