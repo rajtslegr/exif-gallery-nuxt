@@ -36,6 +36,7 @@ pnpm db:generate           # Generate Drizzle migrations from schema changes
 # Code Quality
 pnpm lint --fix            # ESLint with @antfu/eslint-config
 pnpm typecheck             # Vue + TypeScript type checking
+pnpm test                  # Vitest unit tests (pure helpers, no Nuxt runtime)
 
 # UI Components
 pnpm ui add <component>    # Add shadcn-vue component
@@ -64,7 +65,7 @@ The application follows a Cloudflare-native architecture where all data lives at
    - Schema: `photos` (main), `tags` (normalized), `photo_tags` (many-to-many junction table)
 
 3. **Query & Display Flow**:
-   - API (`server/api/photos/index.get.ts`): Supports pagination (`limit`/`offset`), filtering (by `tag`/`camera`/`lens`/`hidden`), sorting (`takenAt`/`createdAt`)
+   - API (`server/api/photos/index.get.ts`): Supports pagination (`limit`/`offset`), filtering (by `tag`/`camera`/`lens`/`search`), sorting (`takenAt`/`createdAt`)
    - Composable (`app/composables/usePhotos.ts`): `usePhotosInfinite` for infinite scroll, `usePhoto` for single item
    - Pinia store (`app/stores/photos.ts`): Client-side cache with infinite scroll state management
 
@@ -79,7 +80,7 @@ photos (1) ←→ (N) photo_tags (N) ←→ (1) tags
 - `photos.id` (CUID, 8 chars): Primary key for photo records
 - `tags.name` (unique): Canonical tag names with `photoCount` denormalized counter
 - `photo_tags`: Junction table with cascade delete on both sides
-- Indexes: `idx_photos_taken_at`, `idx_photos_hidden`, `idx_tags_photo_count`, `idx_photo_tags_photo_id`, `idx_photo_tags_tag_id`
+- Indexes: `idx_photos_taken_at`, `idx_photos_created_at`, `idx_photos_priority_order`, `idx_photos_make_model`, `idx_photos_lens_model`, `idx_tags_photo_count`, `idx_photo_tags_photo_id`, `idx_photo_tags_tag_id_photo_id`
 
 ### AI Integration Architecture
 
@@ -151,7 +152,7 @@ When modifying schema:
 
 - **ESLint**: `@antfu/eslint-config` (single quotes, no semicolons, strict TypeScript)
 - **Prohibited**: `any` type usage (user's explicit rule)
-- **i18n**: Use `$t('key')` in templates, translation files in `i18n/locales/` (en.yml, zh.yml)
+- **i18n**: Use `$t('key')` in templates, translation files in `i18n/locales/` (currently only en.yml)
 - **Type Safety**: Runtime validation with Zod, compile-time with TypeScript strict mode
 
 ## Environment Variables

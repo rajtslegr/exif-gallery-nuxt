@@ -12,26 +12,7 @@ const params = computed(() => ({
   order: order.value,
   search: route.query.search as string | undefined,
 }))
-const { photos, hasMore, loadMore, loading } = usePhotosInfinite(params, LIMIT)
-
-// Initial SSR load
-const { data: initPhotos } = await useFetch('/api/photos', {
-  params: {
-    ...params.value,
-    limit: LIMIT,
-    offset: 0,
-  },
-})
-if (initPhotos.value) {
-  hasMore.value = initPhotos.value.hasMore
-  photos.value = initPhotos.value.data.map(deserializePhoto)
-}
-
-useInfiniteScroll(window, loadMore, { distance: 240, canLoadMore: () => hasMore.value })
-
-// Set up the navigation context
-const { setupNavigation } = useNavigationSetup('grid', params.value, photos, hasMore, LIMIT)
-setupNavigation()
+const { photos, loading } = await usePhotoListPage('grid', params, LIMIT)
 </script>
 
 <template>

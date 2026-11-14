@@ -12,32 +12,16 @@ if (!lensParam) {
   throw new Error('lens is required')
 }
 
-const lensName = computed(() => {
-  return decodeURIComponent(lensParam)
-})
+// Route params are already decoded, so no decodeURIComponent here
+const lensName = computed(() => lensParam)
 
 const LIMIT = 36
-const params = {
-  lens: lensName.value,
-}
-const { photos, hasMore, loadMore, loading } = usePhotosInfinite(params, LIMIT)
-const { data: initPhotos } = await useFetch('/api/photos', {
-  params: {
-    ...params,
-    limit: LIMIT,
-    offset: photos.value.length,
-  },
-})
-if (initPhotos.value) {
-  hasMore.value = initPhotos.value.hasMore
-  photos.value.push(...initPhotos.value.data.map(deserializePhoto))
-}
+const { photos, loading } = await usePhotoListPage('lens', { lens: lensParam }, LIMIT)
 
-useInfiniteScroll(window, loadMore, { distance: 240, canLoadMore: () => hasMore.value })
+if (!photos.value.length)
+  throw createError({ statusCode: 404, statusMessage: 'Lens not found', fatal: true })
 
-// Set up the navigation context
-const { setupNavigation } = useNavigationSetup('lens', params, photos, hasMore, LIMIT)
-setupNavigation()
+useFilterSeoMeta('lens', lensParam)
 </script>
 
 <template>

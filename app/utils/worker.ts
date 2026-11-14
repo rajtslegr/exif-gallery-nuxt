@@ -45,7 +45,7 @@ class WorkerWrapper<Data, Result> {
   processNextTask: () => void = () => {}
 }
 
-class WorkerPoolManager<Data = any, Result = any> {
+class WorkerPoolManager<Data, Result> {
   private workerPool: WorkerWrapper<Data, Result>[] = []
   private taskQueue: Array<{
     message: Data
@@ -98,7 +98,8 @@ class WorkerPoolManager<Data = any, Result = any> {
   }
 }
 
-const MAX_WORKERS = navigator?.hardwareConcurrency || 4
+// This module is also evaluated during SSR, where there is no navigator.
+const MAX_WORKERS = import.meta.client ? (navigator.hardwareConcurrency ?? 4) : 4
 
 type ImageData = Awaited<ReturnType<typeof decode>>
 const decodeWorkerPool = new WorkerPoolManager<{

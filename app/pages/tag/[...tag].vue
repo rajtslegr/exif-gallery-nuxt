@@ -9,31 +9,16 @@ const localePath = useLocalePath()
 const tag = route.params.tag?.[0]
 if (!tag) {
   navigateTo(localePath('/'))
-  throw new Error('id is required')
+  throw new Error('tag is required')
 }
 
 const LIMIT = 36
-const params = {
-  tag,
-}
-const { photos, hasMore, loadMore, loading } = usePhotosInfinite(params, LIMIT)
-const { data: initPhotos } = await useFetch('/api/photos', {
-  params: {
-    ...params,
-    limit: LIMIT,
-    offset: photos.value.length,
-  },
-})
-if (initPhotos.value) {
-  hasMore.value = initPhotos.value.hasMore
-  photos.value.push(...initPhotos.value.data.map(deserializePhoto))
-}
+const { photos, loading } = await usePhotoListPage('tag', { tag }, LIMIT)
 
-useInfiniteScroll(window, loadMore, { distance: 240, canLoadMore: () => hasMore.value })
+if (!photos.value.length)
+  throw createError({ statusCode: 404, statusMessage: 'Tag not found', fatal: true })
 
-// Set up the navigation context
-const { setupNavigation } = useNavigationSetup('tag', params, photos, hasMore, LIMIT)
-setupNavigation()
+useFilterSeoMeta('tag', tag)
 </script>
 
 <template>
