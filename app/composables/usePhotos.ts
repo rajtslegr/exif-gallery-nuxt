@@ -15,7 +15,9 @@ export function usePhotosInfinite(params?: MaybeRef<{
 } {
   const pStore = usePhotosStore()
   const paramsValue = computed(() => toValue(params))
-  const key = computed(() => JSON.stringify(paramsValue.value))
+  // The page size is part of the key: the gallery loads 6 photos per page and the
+  // grid 36, so sharing one cached list would hand the grid the gallery's six.
+  const key = computed(() => JSON.stringify({ params: paramsValue.value, limit }))
 
   // Current state; shallowRef avoids deep reactivity
   const state = shallowRef<InfiniteState>(pStore.getState(key.value))
