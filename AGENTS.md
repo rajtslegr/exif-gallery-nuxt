@@ -58,7 +58,7 @@ applied by `.github/workflows/migrate.yml` on push to `main`.
 handlers that mutate data call `requireUserSession(event)`. Login is
 `POST /api/auth` compared against `NUXT_ADMIN_PASSWORD` (no default; the handler
 returns 500 when unset, and throttles attempts to one per 5 seconds).
-`NUXT_SESSION_PASSWORD` (32+ chars) encrypts the session cookie.
+`NUXT_APP_SECRET` (32+ chars) encrypts the session cookie.
 
 ## Conventions
 

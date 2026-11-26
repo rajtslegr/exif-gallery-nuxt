@@ -47,7 +47,7 @@ Set these in `.env` for local development and in the Workers runtime for product
 | Variable                   | Required | Purpose                                                        |
 | -------------------------- | -------- | -------------------------------------------------------------- |
 | `NUXT_ADMIN_PASSWORD`      | yes      | Admin panel password. Auth returns 500 if unset.               |
-| `NUXT_SESSION_PASSWORD`    | yes      | `nuxt-auth-utils` session key, at least 32 characters.         |
+| `NUXT_APP_SECRET`          | yes      | `nuxt-auth-utils` session key, at least 32 characters.         |
 | `NUXT_PUBLIC_TITLE`        | no       | Site title, falls back to the `title` i18n string.             |
 | `NUXT_PUBLIC_DESCRIPTION`  | no       | Meta description, falls back to the `description` i18n string. |
 | `NUXT_PUBLIC_DEFAULT_VIEW` | no       | Home view: `gallery` (default) or `grid`.                      |

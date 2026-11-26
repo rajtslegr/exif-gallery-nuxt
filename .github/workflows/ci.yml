@@ -15,7 +15,7 @@ jobs:
     # Build-time placeholders only, the real secrets live in the Cloudflare
     # dashboard and are never needed to compile or test the app.
     env:
-      NUXT_SESSION_PASSWORD: ci-session-password-with-at-least-32-chars
+      NUXT_APP_SECRET: ci-session-password-with-at-least-32-chars
       NUXT_ADMIN_PASSWORD: ci-admin-password
     steps:
       - name: Checkout repository
