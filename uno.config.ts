@@ -19,12 +19,14 @@ export default defineConfig({
       mono: 'DM Mono',
     },
   },
-  preflights: [{
-    getCSS: () => `
+  preflights: [
+    {
+      getCSS: () => `
 *, ::before, ::after { --un-default-border-color: oklch(var(--border)); }
 .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1); }
 `,
-  }],
+    },
+  ],
   // By default, `.ts` and `.js` files are NOT extracted.
   // If you want to extract them, use the following configuration.
   // It's necessary to add the following configuration if you use shadcn-vue or shadcn-svelte.

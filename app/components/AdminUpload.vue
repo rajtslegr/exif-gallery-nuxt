@@ -122,7 +122,10 @@ async function processFileExif(fileEntry: FileEntry) {
   if (!photo.takenAt) {
     photo.takenAt = new Date(fileEntry.file.lastModified)
   }
-  fileEntry.photo = { ...fileEntry.photo, ...photo }
+  fileEntry.photo = {
+    ...fileEntry.photo,
+    ...photo,
+  }
   setFile(fileEntry)
 }
 
@@ -160,7 +163,10 @@ async function processFileCompress(fileEntry: FileEntry) {
   }
 
   fileEntry.compressedFile = Object.fromEntries(Object.entries(formatsConfig).map(
-    ([type, value]) => [type, value ? 'loading' : undefined],
+    ([type, value]) => [
+      type,
+      value ? 'loading' : undefined,
+    ],
   ))
   if (formatsConfig.thumbnail && aiConfig.value.enabled) {
     fileEntry.aiLoading = true
@@ -188,9 +194,15 @@ async function processFileAiDescription(fileEntry: FileEntry, thumbnailFile?: Fi
   setFile(fileEntry)
   try {
     const thumbnail = thumbnailFile || fileEntry.compressedFile?.thumbnail
-    const fileToAnalyze = thumbnail instanceof File ? thumbnail : fileEntry.file
+    const fileToAnalyze = thumbnail instanceof File
+      ? thumbnail
+      : fileEntry.file
     const aiData = await aiLimit(() => getAiImageAnalysis(fileToAnalyze, thumbnail instanceof File))
-    fileEntry.photo = { ...fileEntry.photo, ...aiData, tags: aiData.tags.join(',') }
+    fileEntry.photo = {
+      ...fileEntry.photo,
+      ...aiData,
+      tags: aiData.tags.join(','),
+    }
   }
   catch (error: unknown) {
     console.error('Failed to get AI description', error)

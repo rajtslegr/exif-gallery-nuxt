@@ -12,7 +12,9 @@ globalThis.onmessage = async (e) => {
 
   function changeFileExtension(filename: string, suffix: string, maxLength = 255) {
     const baseName = filename.replace(/\.[^.]+$/, '')
-    suffix = suffix.includes('.') ? suffix : `.${suffix}`
+    suffix = suffix.includes('.')
+      ? suffix
+      : `.${suffix}`
     const maxBaseNameLength = maxLength - (suffix.length)
     return `${baseName.slice(0, maxBaseNameLength)}${suffix}`
   }
@@ -57,7 +59,9 @@ globalThis.onmessage = async (e) => {
       })
     }
     else if (options.target === 'avif') {
-      const avifData = options.encodeOptions ? await encodeAvif(dataToEncode, options.encodeOptions) : await encodeAvif(dataToEncode)
+      const avifData = options.encodeOptions
+        ? await encodeAvif(dataToEncode, options.encodeOptions)
+        : await encodeAvif(dataToEncode)
       result = new File([avifData], changeFileExtension(filename, 'avif'), {
         type: 'image/avif',
       })

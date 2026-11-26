@@ -23,16 +23,23 @@ export function getSiteUrl(event: H3Event) {
  * timestamps as UTC.
  */
 export function toLastmod(value: unknown) {
-  if (value instanceof Date)
-    return Number.isNaN(value.getTime()) ? undefined : value.toISOString()
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime())
+      ? undefined
+      : value.toISOString()
+  }
 
   if (typeof value === 'number')
     return new Date(value * 1000).toISOString()
 
   if (typeof value === 'string' && value) {
     const naiveTimestamp = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)
-    const parsed = new Date(naiveTimestamp ? `${value.replace(' ', 'T')}Z` : value)
-    return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString()
+    const parsed = new Date(naiveTimestamp
+      ? `${value.replace(' ', 'T')}Z`
+      : value)
+    return Number.isNaN(parsed.getTime())
+      ? undefined
+      : parsed.toISOString()
   }
 
   return undefined

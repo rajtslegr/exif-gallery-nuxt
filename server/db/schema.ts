@@ -66,7 +66,9 @@ export const photoTag = sqliteTable('photo_tags', {
     .references(() => tag.id, { onDelete: 'cascade' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
 }, table => [
-  primaryKey({ columns: [table.photoId, table.tagId] }),
+  primaryKey({
+    columns: [table.photoId, table.tagId],
+  }),
   index('idx_photo_tags_photo_id').on(table.photoId),
   index('idx_photo_tags_tag_id_photo_id').on(table.tagId, table.photoId),
 ])

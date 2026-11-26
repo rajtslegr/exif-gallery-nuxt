@@ -9,7 +9,9 @@ const config = useRuntimeConfig()
 
 const statusCode = computed(() => props.error.statusCode ?? 500)
 const message = computed(() =>
-  statusCode.value === 404 ? t('error.not_found') : t('error.server'),
+  statusCode.value === 404
+    ? t('error.not_found')
+    : t('error.server'),
 )
 
 useSeoMeta({

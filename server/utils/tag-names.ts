@@ -9,5 +9,7 @@ export function parseTagNames(tags: string) {
     .map(name => name.trim().slice(0, MAX_TAG_NAME_LENGTH))
     .filter(Boolean)
 
-  return [...new Set(names)]
+  return [
+    ...new Set(names),
+  ]
 }

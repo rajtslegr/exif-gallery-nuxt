@@ -10,7 +10,9 @@ const emits = defineEmits<TagsInputRootEmits>()
 
 const model = defineModel<string | undefined>()
 const value = computed({
-  get: () => model.value ? model.value.split(',') : [],
+  get: () => model.value
+    ? model.value.split(',')
+    : [],
   set: (value) => {
     model.value = value.join(',')
   },

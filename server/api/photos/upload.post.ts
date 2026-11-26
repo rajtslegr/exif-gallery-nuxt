@@ -193,6 +193,8 @@ export default eventHandler(async (event) => {
   return {
     success: successfulUploads.length > 0,
     uploaded: successfulUploads,
-    errors: errors.length > 0 ? errors : undefined,
+    errors: errors.length > 0
+      ? errors
+      : undefined,
   }
 })

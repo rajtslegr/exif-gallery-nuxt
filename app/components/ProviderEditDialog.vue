@@ -52,7 +52,9 @@ function getDefaultBaseUrl(providerType: ProviderType): string {
 
 // Normalize the base URL (ensure it ends with /)
 function normalizeBaseUrl(url: string): string {
-  return url.endsWith('/') ? url : `${url}/`
+  return url.endsWith('/')
+    ? url
+    : `${url}/`
 }
 
 // Fetch the model list
@@ -75,7 +77,9 @@ async function fetchModelsList() {
       name: name.value,
       type: type.value,
       apiKey: apiKey.value,
-      baseURL: baseUrl.value ? normalizeBaseUrl(baseUrl.value) : undefined,
+      baseURL: baseUrl.value
+        ? normalizeBaseUrl(baseUrl.value)
+        : undefined,
       model: model.value,
       enabled: false,
       createdAt: Date.now(),
@@ -108,7 +112,9 @@ async function fetchModelsList() {
     console.error('Failed to fetch models:', error)
     testConnectionResult.value = {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch models',
+      error: error instanceof Error
+        ? error.message
+        : 'Failed to fetch models',
     }
   }
   finally {
@@ -126,10 +132,14 @@ function handleSave() {
     name: name.value,
     type: type.value,
     apiKey: apiKey.value,
-    baseURL: baseUrl.value ? normalizeBaseUrl(baseUrl.value) : undefined,
+    baseURL: baseUrl.value
+      ? normalizeBaseUrl(baseUrl.value)
+      : undefined,
     model: model.value!,
     enabled: props.provider?.enabled ?? true,
-    apiFormat: type.value === 'openai' ? apiFormat.value : undefined,
+    apiFormat: type.value === 'openai'
+      ? apiFormat.value
+      : undefined,
   })
 
   // Reset the form

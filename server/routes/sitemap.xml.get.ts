@@ -11,7 +11,9 @@ interface SitemapEntry {
 }
 
 async function collectEntries() {
-  const entries: SitemapEntry[] = [{ path: '/' }]
+  const entries: SitemapEntry[] = [
+    { path: '/' },
+  ]
 
   // Photos are walked in pages so a large library cannot blow up one request
   let offset = 0
@@ -78,7 +80,9 @@ export default eventHandler(async (event) => {
   const urls = entries.map(entry => [
     '  <url>',
     `    <loc>${escapeXml(`${origin}${entry.path}`)}</loc>`,
-    entry.lastmod ? `    <lastmod>${entry.lastmod}</lastmod>` : '',
+    entry.lastmod
+      ? `    <lastmod>${entry.lastmod}</lastmod>`
+      : '',
     '  </url>',
   ].filter(Boolean).join('\n'))
 

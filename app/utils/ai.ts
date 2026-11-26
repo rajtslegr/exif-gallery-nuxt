@@ -84,20 +84,22 @@ export async function getAiImageAnalysis(imageFile: File, compress = true) {
     const base64 = await getCompressedImageBase64(imageFile, compress)
     const { text } = await generateText({
       model,
-      messages: [{
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: `${AI_IMAGE_PROMPT}\n\nReturn the result strictly in the following JSON format：{"title": "", "caption": "", "tags": [], "semanticDescription": ""}`,
-          },
-          {
-            type: 'file',
-            mediaType: 'image',
-            data: base64ToUint8Array(base64),
-          },
-        ],
-      }],
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: `${AI_IMAGE_PROMPT}\n\nReturn the result strictly in the following JSON format：{"title": "", "caption": "", "tags": [], "semanticDescription": ""}`,
+            },
+            {
+              type: 'file',
+              mediaType: 'image',
+              data: base64ToUint8Array(base64),
+            },
+          ],
+        },
+      ],
     })
 
     // Try to extract JSON from the text

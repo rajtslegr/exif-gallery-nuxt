@@ -10,7 +10,10 @@ const params = computed(() => ({
 
 const { photos, hasMore, loadMore, loading } = usePhotosInfinite(params, LIMIT)
 
-useInfiniteScroll(window, loadMore, { distance: 320, canLoadMore: () => hasMore.value })
+useInfiniteScroll(window, loadMore, {
+  distance: 320,
+  canLoadMore: () => hasMore.value,
+})
 
 function photoLabel(photo: IPhoto) {
   return photo.semanticDescription || photo.caption || photo.title || photo.fileName || 'Photo'

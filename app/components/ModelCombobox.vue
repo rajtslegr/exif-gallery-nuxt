@@ -18,9 +18,17 @@ const selectedModel = computed<{ id: string, name: string, isCustom: boolean } |
     return null
   const found = props.models.find(m => m === currentValue)
   if (found) {
-    return { id: found, name: formatModelName(found), isCustom: false }
+    return {
+      id: found,
+      name: formatModelName(found),
+      isCustom: false,
+    }
   }
-  return { id: currentValue, name: formatModelName(currentValue), isCustom: true }
+  return {
+    id: currentValue,
+    name: formatModelName(currentValue),
+    isCustom: true,
+  }
 })
 
 // Get the filtered model list

@@ -43,7 +43,9 @@ export function createAIClient(provider: AIProviderConfig): LanguageModel | null
     switch (provider.type) {
       case 'openai': {
         const client = createOpenAICompatible({
-          name: provider.id === 'openai' ? 'openai' : provider.id,
+          name: provider.id === 'openai'
+            ? 'openai'
+            : provider.id,
           baseURL: provider.baseURL || 'https://api.openai.com/v1',
           apiKey: provider.apiKey,
         })
@@ -130,7 +132,9 @@ export async function fetchModels(
       }
 
       // Ensure baseURL ends with / so URL joining works
-      const normalizedBaseURL = provider.baseURL.endsWith('/') ? provider.baseURL : `${provider.baseURL}/`
+      const normalizedBaseURL = provider.baseURL.endsWith('/')
+        ? provider.baseURL
+        : `${provider.baseURL}/`
       const url = new URL(`${normalizedBaseURL}models`)
 
       const response = await fetch(url.toString(), {
@@ -194,7 +198,9 @@ export async function testProviderConnection(
     return { success: true }
   }
   catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorMessage = error instanceof Error
+      ? error.message
+      : 'Unknown error'
     return { success: false, error: errorMessage }
   }
 }

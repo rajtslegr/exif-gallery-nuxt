@@ -53,7 +53,10 @@ export default defineNuxtConfig({
   ],
   imports: {
     presets: [
-      { from: 'vue-sonner', imports: ['toast'] },
+      {
+        from: 'vue-sonner',
+        imports: ['toast'],
+      },
     ],
   },
   css: [
@@ -90,7 +93,13 @@ export default defineNuxtConfig({
   },
   vite: {
     optimizeDeps: {
-      exclude: ['@jsquash/avif', '@jsquash/jpeg', '@jsquash/png', '@jsquash/resize', '@jsquash/webp'],
+      exclude: [
+        '@jsquash/avif',
+        '@jsquash/jpeg',
+        '@jsquash/png',
+        '@jsquash/resize',
+        '@jsquash/webp',
+      ],
       include: [
         '@lucide/vue',
         'clsx',

@@ -23,7 +23,9 @@ export default eventHandler(async (event) => {
     return { loggedIn: true }
   }
 
-  await setUserSession(event, { lastAttemptAt: Date.now() })
+  await setUserSession(event, {
+    lastAttemptAt: Date.now(),
+  })
 
   throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
 })

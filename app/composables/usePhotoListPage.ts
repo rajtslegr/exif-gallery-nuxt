@@ -38,7 +38,10 @@ export async function usePhotoListPage(
     photos.value = data.value.data.map(deserializePhoto)
   }
 
-  useInfiniteScroll(window, loadMore, { distance: scrollDistance, canLoadMore: () => hasMore.value })
+  useInfiniteScroll(window, loadMore, {
+    distance: scrollDistance,
+    canLoadMore: () => hasMore.value,
+  })
 
   const { setupNavigation } = useNavigationSetup(type, paramsValue.value, photos, hasMore, limit)
   setupNavigation()
@@ -58,6 +61,12 @@ export function useFilterSeoMeta(type: 'tag' | 'camera' | 'lens', param: string)
   const path = `/${type}/${encodeURIComponent(param)}`
   const name = param.replace(/\|/g, ' ')
 
-  useSeoMeta({ title: () => t(`filter.${type}_title`, { name }) })
-  useHead(() => ({ link: [{ rel: 'canonical', href: `${origin}${path}` }] }))
+  useSeoMeta({
+    title: () => t(`filter.${type}_title`, { name }),
+  })
+  useHead(() => ({
+    link: [
+      { rel: 'canonical', href: `${origin}${path}` },
+    ],
+  }))
 }

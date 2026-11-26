@@ -33,7 +33,12 @@ function feed(overrides: Partial<FeedPhotoInput> = {}) {
     origin: 'https://photos.test',
     title: 'Photo Blog',
     description: 'Photos',
-    photos: [{ ...photo, ...overrides }],
+    photos: [
+      {
+        ...photo,
+        ...overrides,
+      },
+    ],
   })
 }
 

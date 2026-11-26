@@ -69,7 +69,9 @@ export async function compressImageMultiResult(
   const encodeTask = (Object.entries(options) as [CompressKeys, CompressOptions | true][]).map(async ([type, option]) => {
     if (!option)
       return
-    const result = await encode(imageData, file.name, option === true ? { target: type } : option)
+    const result = await encode(imageData, file.name, option === true
+      ? { target: type }
+      : option)
     results[type] = result
     await completeCallback?.(type, result)
   })

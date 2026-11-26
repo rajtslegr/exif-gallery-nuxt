@@ -47,7 +47,9 @@ export function usePhotosInfinite(params?: MaybeRef<{
     }
     catch (error) {
       console.error(error)
-      toast.error('An error occurred', { description: getErrorMessage(error, 'Failed to get photos') })
+      toast.error('An error occurred', {
+        description: getErrorMessage(error, 'Failed to get photos'),
+      })
     }
     finally {
       loading.value = false
@@ -81,18 +83,24 @@ export async function usePhoto(id: MaybeRef<string>) {
   // awaited so the page knows the outcome during SSR (real 404 instead of a skeleton)
   const { data, pending, error, refresh } = await useFetch<SerializeObject<APIDataPhoto>>(
     () => `/api/photos/${photoId.value}`,
-    { watch: [photoId] },
+    {
+      watch: [photoId],
+    },
   )
 
   // Keep the toast feedback for client-side failures (e.g. photo deleted meanwhile)
   watch(error, (err) => {
     if (!err)
       return
-    toast.error('An error occurred', { description: getErrorMessage(err, 'Failed to get photo') })
+    toast.error('An error occurred', {
+      description: getErrorMessage(err, 'Failed to get photo'),
+    })
   }, { immediate: true })
 
   return {
-    photo: computed(() => (data.value ? deserializePhoto(data.value) : null)),
+    photo: computed(() => (data.value
+      ? deserializePhoto(data.value)
+      : null)),
     loading: pending,
     error,
     refresh,

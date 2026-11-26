@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { hasImageSignature, MAX_FILE_BYTES, parseFormDate, toPhotoFileName } from './upload'
 
 function fileWithBytes(name: string, bytes: number[], type = 'image/jpeg') {
-  return new File([new Uint8Array(bytes)], name, { type })
+  return new File([
+    new Uint8Array(bytes),
+  ], name, { type })
 }
 
 describe('toPhotoFileName', () => {
@@ -37,17 +39,52 @@ describe('hasImageSignature', () => {
   })
 
   it('accepts png', async () => {
-    const png = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]
+    const png = [
+      0x89,
+      0x50,
+      0x4E,
+      0x47,
+      0x0D,
+      0x0A,
+      0x1A,
+      0x0A,
+    ]
     await expect(hasImageSignature(fileWithBytes('a.png', png, 'image/png'))).resolves.toBe(true)
   })
 
   it('accepts webp', async () => {
-    const webp = [0x52, 0x49, 0x46, 0x46, 0, 0, 0, 0, 0x57, 0x45, 0x42, 0x50]
+    const webp = [
+      0x52,
+      0x49,
+      0x46,
+      0x46,
+      0,
+      0,
+      0,
+      0,
+      0x57,
+      0x45,
+      0x42,
+      0x50,
+    ]
     await expect(hasImageSignature(fileWithBytes('a.webp', webp, 'image/webp'))).resolves.toBe(true)
   })
 
   it('accepts avif', async () => {
-    const avif = [0, 0, 0, 0, 0x66, 0x74, 0x79, 0x70, 0x61, 0x76, 0x69, 0x66]
+    const avif = [
+      0,
+      0,
+      0,
+      0,
+      0x66,
+      0x74,
+      0x79,
+      0x70,
+      0x61,
+      0x76,
+      0x69,
+      0x66,
+    ]
     await expect(hasImageSignature(fileWithBytes('a.avif', avif, 'image/avif'))).resolves.toBe(true)
   })
 

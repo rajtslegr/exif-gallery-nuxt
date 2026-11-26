@@ -24,7 +24,9 @@ const photo = defineModel<IPhotoForm>({ required: true })
 const activeId = defineModel<number>('activeId')
 const isOpen = computed({
   get: () => activeId.value === props.id,
-  set: value => value ? activeId.value = props.id : activeId.value = undefined,
+  set: value => value
+    ? activeId.value = props.id
+    : activeId.value = undefined,
 })
 
 const compressLoading = computed(() =>

@@ -33,10 +33,14 @@ const { loggedIn } = useUserSession()
 
 const { photo, error: photoError } = await usePhoto(id)
 if (photoError.value) {
-  const statusCode = getErrorStatus(photoError.value) === 404 ? 404 : 500
+  const statusCode = getErrorStatus(photoError.value) === 404
+    ? 404
+    : 500
   throw createError({
     statusCode,
-    statusMessage: statusCode === 404 ? 'Photo not found' : 'Failed to load photo',
+    statusMessage: statusCode === 404
+      ? 'Photo not found'
+      : 'Failed to load photo',
     fatal: true,
   })
 }
@@ -46,12 +50,16 @@ const origin = useRequestURL().origin
 
 const photoImageUrl = computed(() => {
   const path = photo.value?.webp || photo.value?.jpeg || photo.value?.avif
-  return path ? `${origin}/photos/${path}` : undefined
+  return path
+    ? `${origin}/photos/${path}`
+    : undefined
 })
 
 const photoTitle = computed(() => photo.value?.title || photo.value?.fileName)
 const photoDescription = computed(() => photo.value?.caption || photo.value?.semanticDescription)
-const photoUrl = computed(() => photo.value ? `${origin}/p/${photo.value.id}` : undefined)
+const photoUrl = computed(() => photo.value
+  ? `${origin}/p/${photo.value.id}`
+  : undefined)
 
 useSeoMeta({
   title: () => photoTitle.value,
@@ -65,28 +73,38 @@ useSeoMeta({
 })
 
 useHead(() => ({
-  link: photoUrl.value ? [{ rel: 'canonical', href: photoUrl.value }] : [],
+  link: photoUrl.value
+    ? [
+        { rel: 'canonical', href: photoUrl.value },
+      ]
+    : [],
   script: photo.value
-    ? [{
-        type: 'application/ld+json',
-        // Structured data for image search. A caption containing a closing script
-        // tag must not end this block, so every `<` is escaped.
-        innerHTML: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'ImageObject',
-          'name': photoTitle.value,
-          'description': photoDescription.value,
-          'contentUrl': photoImageUrl.value,
-          'thumbnailUrl': photo.value.thumbnail ? `${origin}/photos/${photo.value.thumbnail}` : undefined,
-          'url': photoUrl.value,
-          'datePublished': (photo.value.takenAt ?? photo.value.createdAt)?.toISOString(),
-          'uploadDate': photo.value.createdAt?.toISOString(),
-          'keywords': photo.value.tags.length ? photo.value.tags.join(', ') : undefined,
-          'copyrightHolder': config.public.title
-            ? { '@type': 'Organization', 'name': config.public.title }
-            : undefined,
-        }).replace(/</g, '\\u003c'),
-      }]
+    ? [
+        {
+          type: 'application/ld+json',
+          // Structured data for image search. A caption containing a closing script
+          // tag must not end this block, so every `<` is escaped.
+          innerHTML: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'ImageObject',
+            'name': photoTitle.value,
+            'description': photoDescription.value,
+            'contentUrl': photoImageUrl.value,
+            'thumbnailUrl': photo.value.thumbnail
+              ? `${origin}/photos/${photo.value.thumbnail}`
+              : undefined,
+            'url': photoUrl.value,
+            'datePublished': (photo.value.takenAt ?? photo.value.createdAt)?.toISOString(),
+            'uploadDate': photo.value.createdAt?.toISOString(),
+            'keywords': photo.value.tags.length
+              ? photo.value.tags.join(', ')
+              : undefined,
+            'copyrightHolder': config.public.title
+              ? { '@type': 'Organization', 'name': config.public.title }
+              : undefined,
+          }).replace(/</g, '\\u003c'),
+        },
+      ]
     : [],
 }))
 
@@ -276,7 +294,9 @@ async function goToRandomPhoto() {
   if (navStore.hasMore)
     await navStore.loadMorePhotos()
 
-  let nextId = preloadedForPhotoId === id.value ? preloadedNextPhotoId : undefined
+  let nextId = preloadedForPhotoId === id.value
+    ? preloadedNextPhotoId
+    : undefined
   if (!nextId) {
     let candidates = navStore.photoIds.filter(photoId => photoId !== id.value && !randomVisited.has(photoId))
     if (candidates.length === 0) {
@@ -346,7 +366,11 @@ watch([slideshowPlaying, slideshowInterval, slideshowMode], () => {
   scheduleSlideshow()
   void preloadNextPhoto()
 })
-watch([photo, hasContext, () => route.params.id], () => {
+watch([
+  photo,
+  hasContext,
+  () => route.params.id,
+], () => {
   scheduleSlideshow()
   void preloadNextPhoto()
 }, { immediate: true })

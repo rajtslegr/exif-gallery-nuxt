@@ -49,12 +49,16 @@ export function buildRssFeed({ origin, title, description, photos }: FeedOptions
     const link = `${origin}/p/${photo.id}`
     const name = photo.title || photo.fileName
     const path = imagePath(photo)
-    const imageUrl = path ? `${origin}/photos/${path}` : null
+    const imageUrl = path
+      ? `${origin}/photos/${path}`
+      : null
 
     // Escaped once as a whole below, so the parts stay raw here
     const body = [
       photo.caption || photo.semanticDescription,
-      imageUrl ? `<img src="${imageUrl}" alt="${name}">` : '',
+      imageUrl
+        ? `<img src="${imageUrl}" alt="${name}">`
+        : '',
     ].filter(Boolean).join('\n')
 
     return [
@@ -64,7 +68,9 @@ export function buildRssFeed({ origin, title, description, photos }: FeedOptions
       `      <guid isPermaLink="true">${escapeXml(link)}</guid>`,
       `      <pubDate>${toRfc822(photo.takenAt ?? photo.createdAt)}</pubDate>`,
       `      <description>${escapeXml(body)}</description>`,
-      imageUrl ? `      <enclosure url="${escapeXml(imageUrl)}" type="${imageMime(photo)}" length="0" />` : '',
+      imageUrl
+        ? `      <enclosure url="${escapeXml(imageUrl)}" type="${imageMime(photo)}" length="0" />`
+        : '',
       ...photo.tags.map(tag => `      <category>${escapeXml(tag)}</category>`),
       '    </item>',
     ].filter(Boolean).join('\n')

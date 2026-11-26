@@ -32,5 +32,8 @@ export default eventHandler(async (event) => {
   if (user)
     return { ...photo, tags }
 
-  return { ...toPublicPhoto(photo), tags }
+  return {
+    ...toPublicPhoto(photo),
+    tags,
+  }
 })

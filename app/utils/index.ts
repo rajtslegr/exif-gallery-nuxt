@@ -18,8 +18,26 @@ export function formatFileSize(bytes: number, si = true, dp = 1) {
     return `${bytes} B`
 
   const units = si
-    ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-    : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+    ? [
+        'kB',
+        'MB',
+        'GB',
+        'TB',
+        'PB',
+        'EB',
+        'ZB',
+        'YB',
+      ]
+    : [
+        'KiB',
+        'MiB',
+        'GiB',
+        'TiB',
+        'PiB',
+        'EiB',
+        'ZiB',
+        'YiB',
+      ]
   let u = -1
   const r = 10 ** dp
 
@@ -44,7 +62,9 @@ type ExifTextFields = Partial<Pick<IPhoto, 'fNumber' | 'exposureTime' | 'iso' | 
 export function formatExposure(p: ExifTextFields): string[] {
   return [
     `ƒ/${p.fNumber || '--'}`,
-    `${p.exposureTime ? formatExposureTime(p.exposureTime) : '--'}s`,
+    `${p.exposureTime
+      ? formatExposureTime(p.exposureTime)
+      : '--'}s`,
     `ISO ${p.iso || '--'}`,
   ]
 }
@@ -79,9 +99,17 @@ export async function getCompressedImageBase64(file: File, compress: boolean): P
 export function deserializePhoto(p: SerializeObject<APIDataPhoto>): IPhoto {
   return {
     ...(Object.fromEntries(Object.entries(p).map(([key, value]) => [key, value ?? undefined])) as unknown as IPhoto),
-    fileModified: p.fileModified ? new Date(p.fileModified) : undefined,
-    takenAt: p.takenAt ? new Date(p.takenAt) : undefined,
-    createdAt: p.createdAt ? new Date(p.createdAt) : undefined,
-    updatedAt: p.updatedAt ? new Date(p.updatedAt) : undefined,
+    fileModified: p.fileModified
+      ? new Date(p.fileModified)
+      : undefined,
+    takenAt: p.takenAt
+      ? new Date(p.takenAt)
+      : undefined,
+    createdAt: p.createdAt
+      ? new Date(p.createdAt)
+      : undefined,
+    updatedAt: p.updatedAt
+      ? new Date(p.updatedAt)
+      : undefined,
   } as IPhoto
 }

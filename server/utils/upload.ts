@@ -27,7 +27,9 @@ export function parseFormDate(value: FormDataEntryValue | null) {
     return null
 
   const date = new Date(value.toString())
-  return Number.isNaN(date.getTime()) ? null : date
+  return Number.isNaN(date.getTime())
+    ? null
+    : date
 }
 
 /**

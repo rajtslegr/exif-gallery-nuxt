@@ -11,7 +11,9 @@ import { loadPhotoTags } from '../../utils/photos'
 const nullableText = z.string()
   .nullable()
   .optional()
-  .transform(value => value === undefined ? undefined : (value?.trim() || null))
+  .transform(value => value === undefined
+    ? undefined
+    : (value?.trim() || null))
 
 const nullableNumber = z.number().nullable().optional()
 
@@ -51,7 +53,11 @@ export default defineEventHandler(async (event) => {
       .set({
         ...rest,
         // `undefined` leaves the column alone, `null` clears it
-        takenAt: takenAt === null ? null : takenAt ? new Date(takenAt) : undefined,
+        takenAt: takenAt === null
+          ? null
+          : takenAt
+            ? new Date(takenAt)
+            : undefined,
         updatedAt: new Date(),
       })
       .where(eq(schema.photo.id, id))

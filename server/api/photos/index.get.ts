@@ -10,7 +10,10 @@ const photoQuerySchema = z.object({
   offset: z.coerce.number().int().min(0).default(0),
   orderBy: z.enum(['takenAt', 'createdAt', 'priorityOrder']).default('takenAt'),
   order: z.enum(['asc', 'desc']).default('desc'),
-  tag: z.union([z.string(), z.array(z.string())]).optional(),
+  tag: z.union([
+    z.string(),
+    z.array(z.string()),
+  ]).optional(),
   camera: z.string().max(200).optional(),
   lens: z.string().max(200).optional(),
   search: z.string().max(100).optional(),
@@ -31,7 +34,12 @@ function toResponsePhoto(
   includePrivateFields: boolean,
 ): PublicPhoto & { tags: string[] } {
   const tags = tagsByPhotoId.get(photo.id) ?? []
-  return includePrivateFields ? { ...photo, tags } : { ...toPublicPhoto(photo), tags }
+  return includePrivateFields
+    ? { ...photo, tags }
+    : {
+        ...toPublicPhoto(photo),
+        tags,
+      }
 }
 
 export default eventHandler(async (event): Promise<PhotosResponse> => {
@@ -114,17 +122,28 @@ export default eventHandler(async (event): Promise<PhotosResponse> => {
     ? [
         // Featured photos first, then the usual newest-first order for the rest
         asc(sql`${schema.photo.priorityOrder} is null`),
-        order === 'asc' ? asc(schema.photo.priorityOrder) : desc(schema.photo.priorityOrder),
+        order === 'asc'
+          ? asc(schema.photo.priorityOrder)
+          : desc(schema.photo.priorityOrder),
         desc(schema.photo.takenAt),
         desc(schema.photo.id),
       ]
-    : [order === 'asc' ? asc(orderColumn) : desc(orderColumn), desc(schema.photo.id)]
-  const photoConditions = conditions.length > 0 ? and(...conditions) : undefined
+    : [
+        order === 'asc'
+          ? asc(orderColumn)
+          : desc(orderColumn),
+        desc(schema.photo.id),
+      ]
+  const photoConditions = conditions.length > 0
+    ? and(...conditions)
+    : undefined
   const queryLimit = limitNum + 1
 
   if (tag) {
     // A single tag param is one full tag; repeated tag params mean multi-tag filtering.
-    const tagNames = (Array.isArray(tag) ? tag : [tag]).map(String).filter(Boolean)
+    const tagNames = (Array.isArray(tag)
+      ? tag
+      : [tag]).map(String).filter(Boolean)
     const matchedPhotoIds = db.$with('matched_photo_ids').as(
       tagNames.length === 1
         ? db.select({ photoId: schema.photoTag.photoId })

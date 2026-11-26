@@ -64,7 +64,12 @@ export async function processPhotoTags(photoId: string, tags: string | null | un
   const currentTagIds = currentPhotoTags.map(photoTag => photoTag.tagId)
 
   const tagIds = await resolveTagIds(tagNames)
-  const affectedTagIds = [...new Set([...currentTagIds, ...tagIds])]
+  const affectedTagIds = [
+    ...new Set([
+      ...currentTagIds,
+      ...tagIds,
+    ]),
+  ]
 
   if (!affectedTagIds.length)
     return

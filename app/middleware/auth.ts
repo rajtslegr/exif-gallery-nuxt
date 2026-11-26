@@ -4,7 +4,11 @@ export default defineNuxtRouteMiddleware((to) => {
   if (!loggedIn.value) {
     return navigateTo({
       path: localePath('/admin/login'),
-      query: { redirect: to.fullPath === localePath('/admin/login') ? localePath('/admin') : to.fullPath },
+      query: {
+        redirect: to.fullPath === localePath('/admin/login')
+          ? localePath('/admin')
+          : to.fullPath,
+      },
     },
     )
   }

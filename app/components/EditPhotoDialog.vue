@@ -13,7 +13,10 @@ const editedPhoto = ref<IPhoto>()
 // UploadPhotoForm works with the comma separated tag string, IPhoto with an array
 const editedPhotoForm = computed<IPhotoForm>({
   get: () => editedPhoto.value
-    ? { ...editedPhoto.value, tags: editedPhoto.value.tags.join(',') }
+    ? {
+        ...editedPhoto.value,
+        tags: editedPhoto.value.tags.join(','),
+      }
     : {},
   set: (form) => {
     if (!editedPhoto.value)
@@ -21,7 +24,9 @@ const editedPhotoForm = computed<IPhotoForm>({
     editedPhoto.value = {
       ...editedPhoto.value,
       ...form,
-      tags: form.tags ? form.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
+      tags: form.tags
+        ? form.tags.split(',').map(tag => tag.trim()).filter(Boolean)
+        : [],
     }
   },
 })
@@ -54,7 +59,9 @@ const EDITABLE_FIELDS = [
  * value alone instead of clearing it.
  */
 function buildPayload(photo: IPhoto) {
-  const body: Record<string, unknown> = { tags: photo.tags.join(',') }
+  const body: Record<string, unknown> = {
+    tags: photo.tags.join(','),
+  }
 
   for (const field of EDITABLE_FIELDS) {
     const value = photo[field]
@@ -63,7 +70,9 @@ function buildPayload(photo: IPhoto) {
 
     body[field] = field === 'takenAt'
       ? new Date(value as Date | string).toISOString()
-      : value === '' ? null : value
+      : value === ''
+        ? null
+        : value
   }
 
   return body

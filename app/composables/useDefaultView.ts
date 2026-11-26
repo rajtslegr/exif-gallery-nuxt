@@ -6,7 +6,9 @@ export type ViewMode = 'gallery' | 'grid'
 export function useDefaultView() {
   const config = useRuntimeConfig()
   const defaultView = computed<ViewMode>(() =>
-    config.public.defaultView === 'grid' ? 'grid' : 'gallery',
+    config.public.defaultView === 'grid'
+      ? 'grid'
+      : 'gallery',
   )
 
   return {

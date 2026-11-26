@@ -28,7 +28,12 @@ useHead({
   ],
   link: [
     { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-    { rel: 'alternate', type: 'application/rss+xml', title, href: '/feed.xml' },
+    {
+      rel: 'alternate',
+      type: 'application/rss+xml',
+      title,
+      href: '/feed.xml',
+    },
   ],
   htmlAttrs: {
     lang: 'en',
