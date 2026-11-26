@@ -1,0 +1,12 @@
+{
+  "commitMessagePrefix": "⬆️ ",
+  "extends": ["config:base"],
+  "minimumReleaseAge": "3 days",
+  "reviewers": ["rajtslegr"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    }
+  ]
+}
