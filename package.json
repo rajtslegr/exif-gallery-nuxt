@@ -63,7 +63,7 @@
     "@nuxt/fonts": "1.2.0",
     "@nuxtjs/color-mode": "4.1.0",
     "@nuxtjs/i18n": "10.6.0",
-    "@types/node": "26.6.7",
+    "@types/node": "26.6.10",
     "@unocss/eslint-plugin": "66.13.0",
     "@unocss/nuxt": "66.13.0",
     "drizzle-kit": "0.31.11",
